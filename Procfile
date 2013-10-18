@@ -1,1 +1,1 @@
-worker: python twitbot.py
+urgentworker: python twitbot.py

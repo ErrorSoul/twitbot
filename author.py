@@ -21,4 +21,4 @@ twitter = Twython(CONSUMER_KEY, CONSUMER_SECRET,
                  OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
 final_step = twitter.get_authorized_tokens(oauth_verifier)
 
-print final_step , "ffffffffffff"
+print final_step 

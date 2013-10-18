@@ -39,7 +39,7 @@ class TwitBot(object):
                 self.update_status(text,user)
             sleep(300)
 
-    def update_status(self, text, user, q_id):
+    def update_status(self, text, user):
         q_id = self.id if self.query == u"хохол" else self.jd
         if user[1] != u"ghohol" and user[0] > q_id[0]:
             try:

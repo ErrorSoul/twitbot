@@ -1,1 +1,1 @@
-clock: python twitbot.py
+worker: python twitbot.py

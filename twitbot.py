@@ -17,3 +17,6 @@ twitter.update_status(status='See how easy using Twython is!')
 ##     for d in c:
 ##         print d + " = " , c[d]
 
+a = open('ddd','w')
+a.write("dddd")
+a.close()

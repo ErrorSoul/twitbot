@@ -1,1 +1,1 @@
-urgentworker: python twitbot.py
+clock: python twitbot.py

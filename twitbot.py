@@ -10,10 +10,11 @@ twitter = Twython(CONSUMER_KEY,CONSUMER_SECRET,
                   OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
 
 g = u"жид"
-try :
-    twitter.update_status(status='See how easy using Twython is!')
-except TwythonError:
-    pass
+while True:
+    try :
+        twitter.update_status(status='See how easy using Twython is!')
+    except TwythonError:
+        time.sleep(5)
     
 ## t=  twitter.search(q=g)
 

@@ -46,7 +46,7 @@ class TwitBot(object):
                 self.twitter.update_status(status= u"@{0} {1}".format(
                                            user[1], choice(text)),
                                            in_reply_to_status_id=user[0])
-                q.id[0] = user[0]
+                q_id[0] = user[0]
                 sleep(480)
             except TwythonError as err:
                 print err

@@ -1,5 +1,5 @@
 #coding: utf-8
-
+import time
 from twython import Twython
 CONSUMER_KEY       = "Dc8GNbgcOklJie3TV2V0A"
 CONSUMER_SECRET    = "QducleApTwunlqZmNM0AdhwlhWpoDJ44agk6UnPs"
@@ -20,3 +20,5 @@ twitter.update_status(status='See how easy using Twython is!')
 a = open('ddd','w')
 a.write("dddd")
 a.close()
+while True:
+    time.sleep(20)

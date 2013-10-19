@@ -21,13 +21,14 @@ text = [morning, afternoon, night]
 
 
 class TwitBot(object):
-    time = [(4, 59), (13, 59), (19, 59)]
+    
 
     def __init__(self,c_key, c_secret,
                  o_token, o_token_secret):
         self.twitter = Twython(c_key, c_secret, o_token, o_token_secret)
         self.id = [391240789764112385]
         self.jd = [391091716893458433]
+        self.time = [(4, 59), (13, 59), (20, 59)]
         
 
     def run_search(self, query, text):
@@ -41,6 +42,7 @@ class TwitBot(object):
 
             s = sorted(s)
             print s
+            print "#" * 20
             ## for user in s:
             ##     self.update_status(text,user)
             ## sleep(300)
@@ -57,22 +59,30 @@ class TwitBot(object):
             except TwythonError as err:
                 print err
                 sleep(400)
+
+    def my_reetwets(self):
+        return self.twitter.retweeted_of_me()
+
+    def get_followers_ids(self):
+        return self.twitter.get_followers_ids()
     
     def date_status(self, text):
         current_time = datetime.now()
         print current_time, "fffffffffffffff"
+        
         def part_of_day(a):
             return current_time.hour == a[0] and current_time.minute in range(a[1])
         s = filter(part_of_day, self.time)
         if s:
             print "tttttt"
-            message =  choice(text[self.time.index(s[0])])
-            try:
-                self.twitter.update_status(status= u"{0}".format(message))
-                sleep(20)
-            except TwythonError as err:
-                print err
-                sleep(280)
+            sleep(10)
+            ## message =  choice(text[self.time.index(s[0])])
+            ## try:
+            ##     self.twitter.update_status(status= u"{0}".format(message))
+            ##     sleep(660)
+            ## except TwythonError as err:
+            ##     print err
+            ##     sleep(280)
 
 class T_date(Thread):
     def __init__(self, twitter):
@@ -88,12 +98,17 @@ class T_date(Thread):
 if __name__ == "__main__":
     twitter = TwitBot(CONSUMER_KEY,CONSUMER_SECRET,
                       OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
-    t = T_date(twitter)
-    t.daemon = True
-    t.start()
-    while True:
-        #twitter.date_status(text)
-        for c in g:
-            twitter.run_search(c,replays)
-            #sleep(480)
-        sleep(500)
+    a = twitter.get_followers_ids()
+    print a
+    for c in a:
+        print c
+        print "*" * 20 
+    ## t = T_date(twitter)
+    ## t.daemon = True
+    ## t.start()
+    ## while True:
+    ##     twitter.date_status(text)
+    ##     for c in g:
+    ##         twitter.run_search(c,replays)
+    ##         sleep(480)
+    ##     sleep(5)

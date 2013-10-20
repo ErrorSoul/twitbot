@@ -1,10 +1,11 @@
 #coding: utf-8
 
 from twython import Twython, TwythonError 
-from random import choice
+from random import choice, randint 
 from datetime import datetime
 from threading import Thread
-from time import sleep
+from time import time as t
+from time import  sleep
 from text import replays, night, afternoon, morning
 
 CONSUMER_KEY       = "Dc8GNbgcOklJie3TV2V0A"
@@ -36,16 +37,23 @@ class TwitBot(object):
         self.query = query 
         result =  self.twitter.search(q=query)
         if result:
+            
 
             #users = [(tweet id, user screen_name)]
             users = [(int(c["id"]), c["user"]["screen_name"])
                      for c in result["statuses"] if
-                     c["user"]["screen_name"] != u"ghohol"]
-
+                     (c["user"]["screen_name"] != u"ghohol" and
+                      u"RT" not in c["text"])
+                    ]
+            
+            retweets = self.my_reetwets()
+            users = [x for x in users if x[0] not in retweets]
+           
             #sorted tweets from older to younger
             users = sorted(users)
             print users
-            print "#" * 20
+            
+            print "#" * 30
             ## for user in s:
             ##     self.update_status(text,user)
             sleep(5)
@@ -53,7 +61,7 @@ class TwitBot(object):
     def update_status(self, text, user):
         q_id = self.id if self.query == u"хохол" else self.jd
 
-        #check replayed tweed
+        #replayed tweet or not 
         if  user[0] > q_id[0]:
             try:
                 self.twitter.update_status(status= u"@{0} {1}".format(
@@ -66,8 +74,18 @@ class TwitBot(object):
                 print err
                 sleep(400)
 
+    def show_status(self,*args, **kwargs):
+        return self.twitter.show_status(*args, **kwargs)
+
+
+
+    
     def my_reetwets(self):
-        return self.twitter.retweeted_of_me()
+        """return id of my retweets"""
+
+        retweets =  self.twitter.retweeted_of_me()
+        retweets_id = [c["id"] for c in retweets]
+        return retweets_id
 
     def get_followers_ids(self):
         return self.twitter.get_followers_ids()
@@ -88,13 +106,15 @@ class TwitBot(object):
             ## message =  choice(text[self.time.index(s[0])])
             ## try:
             ##     self.twitter.update_status(status= u"{0}".format(message))
-            ##     sleep(660)
+            ##     sleep(1200)
             ## except TwythonError as err:
             ##     print err
-            ##     sleep(280)
+            ##     sleep(480)
+        else:
+            sleep(1000)
 
 class T_date(Thread):
-    """Class for update status on time"""
+    """Class for update status in certain time"""
     def __init__(self, twitter):
         Thread.__init__(self)
         self.twitter= twitter
@@ -108,17 +128,22 @@ class T_date(Thread):
 if __name__ == "__main__":
     twitter = TwitBot(CONSUMER_KEY,CONSUMER_SECRET,
                       OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
-    a = twitter.my_reetwets()
-    print a
+    
+    ## h = twitter.show_status(id=391313123053166592)
+    ## for c in h:
+    ##     print c,"=", h[c]
+    ## a = twitter.my_reetwets()
+    ## print a
     ## for c in a:
-    ##     print c
-    ##     print "*" * 20 
+    ##     if u"хохол" in c[1]:
+    ##         print c[1]
+    ##         print "*" * 20 
     ## t = T_date(twitter)
     ## t.daemon = True
     ## t.start()
-    ## while True:
-    ##     #twitter.date_status(text)
-    ##     for query in QUERYS:
-    ##         twitter.run_search(query,replays)
+    while True:
+        #twitter.date_status(text)
+        for query in QUERYS:
+            twitter.run_search(query,replays)
     ##         sleep(480)
     ##     sleep(5)

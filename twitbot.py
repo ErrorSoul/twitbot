@@ -46,15 +46,15 @@ class TwitBot(object):
                       u"RT" not in c["text"])
                     ]
             
-            retweets = self.my_reetwets()
-            users = [x for x in users if x[0] not in retweets]
+            ##retweets = self.my_reetwets()
+            ##users = [x for x in users if x[0] not in retweets]
            
             #sorted tweets from older to younger
             users = sorted(users)
             print users
             
             print "#" * 30
-            ## for user in s:
+            ## for user in users:
             ##     self.update_status(text,user)
             sleep(5)
             
@@ -76,6 +76,27 @@ class TwitBot(object):
 
     def show_status(self,*args, **kwargs):
         return self.twitter.show_status(*args, **kwargs)
+
+
+    def get_replays(self,tweet):
+        dirty_list = [u"хуй", u"пидор",u"пидар", u"пидр",
+                      u"бля", u"блядь", u"сука",u"ебень",
+                      u"гондон", u"гандон", u"шлюха",
+                      u"чмо", u"залупа", u"eблан",
+                      u"козел", u"казел", u"козлина",
+                      u"тварь"
+                     ]
+        
+        
+        def is_shit(tweet):
+            for word in dirty_list:
+                if word in tweet:
+                    return word
+                
+            return False
+
+        return is_shit(tweet)
+            
 
 
 
@@ -111,7 +132,7 @@ class TwitBot(object):
             ##     print err
             ##     sleep(480)
         else:
-            sleep(1000)
+            sleep(10)
 
 class T_date(Thread):
     """Class for update status in certain time"""
@@ -123,11 +144,24 @@ class T_date(Thread):
         while True:
             self.twitter.date_status(TEXT)
     
-
+class D(Thread):
+    def p(self):
+        a = datetime.now()
+        print "CURRENT TIME ==> {0}".format(a)
+        sleep (6)
+        
+    def run(self):
+        while True:
+            self.p()
+        
 
 if __name__ == "__main__":
     twitter = TwitBot(CONSUMER_KEY,CONSUMER_SECRET,
                       OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
+    z = u"хуй"
+    t = u"пошел на хуй "
+    print z in t
+    print twitter.get_replays(t)
     
     ## h = twitter.show_status(id=391313123053166592)
     ## for c in h:
@@ -137,13 +171,16 @@ if __name__ == "__main__":
     ## for c in a:
     ##     if u"хохол" in c[1]:
     ##         print c[1]
-    ##         print "*" * 20 
+    ##         print "*" * 20
+    ## d = D()
+    ## d.daemon = True
+    ## d.start()
     ## t = T_date(twitter)
     ## t.daemon = True
     ## t.start()
-    while True:
-        #twitter.date_status(text)
-        for query in QUERYS:
-            twitter.run_search(query,replays)
+    ## while True:
+    ##     #twitter.date_status(text)
+    ##     for query in QUERYS:
+    ##         twitter.run_search(query,replays)
     ##         sleep(480)
     ##     sleep(5)

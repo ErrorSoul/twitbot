@@ -62,7 +62,7 @@ class TwitBot(object):
             print "#" * 30
             ## for user in users:
             ##     self.update_status(text,user)
-            sleep(5)
+            sleep(randint(60,240))
         else:
             pass 
             
@@ -77,7 +77,7 @@ class TwitBot(object):
                                            in_reply_to_status_id=user[0])
                 #save last tweet id 
                 q_id[0] = user[0]
-                sleep(480)
+                sleep(randint(180,400))
             except TwythonError as err:
                 print err
                 sleep(400)
@@ -97,7 +97,7 @@ class TwitBot(object):
             self.twitter.update_status(status= u"@{0} {1}".format(
                                        name, choice(answers)),
                                       in_reply_to_status_id=id)
-            sleep(140 + randint(0,120))
+            sleep(randint(140,260))
             
         except TwythonError as err:
             print err
@@ -105,9 +105,14 @@ class TwitBot(object):
 
  
     def retweet(self,id):
-        pass 
+        try:
+            self.twitter.retweet(id)
+            sleep(randint(60,180))
+        except TwythonError as e:
+            print e
+            sleep(120)
         
-    def get_replays(self,tweet):
+    def get_replays(self):
         dirty_list = [u"хуй", u"пидор",u"пидар", u"пидр",
                       u"бля", u"блядь", u"сука",u"ебень",
                       u"гондон", u"гандон", u"шлюха",
@@ -117,17 +122,30 @@ class TwitBot(object):
                       u"блять", u"уеби", u"бендеровец"
                      ]
         
-        h = {0: self.retweet,
-             1: self.update_status}
+        
+
         def is_shit(tweet):
-            t = tweet.lower()
+            t = tweet[2].lower()
             for word in dirty_list:
-                
                 if word in t:
                     return word
-                
             return False
-
+        since_id = self.m_id
+        try:
+            repl = self.twitter.get_mentions_timeline(include_rts = 0
+                                                 )
+            if repl:
+                repl =[(c["id"],c["user"]["screen_name"],c["text"]) for c
+                       in repl if u"RT" not in c["text"]]
+                repl = filter(is_shit,repl)
+                if repl:
+                    for tw in repl:
+                       ( self.retweet(tw[0]) if randint(0,1)
+                         else self.update_dirty_status(tw[1],tw[0]))
+                return repl 
+        except TwythonError as err:
+            print err
+            sleep(360)
         return is_shit(tweet)
             
 
@@ -160,7 +178,7 @@ class TwitBot(object):
             ## message =  choice(text[self.time.index(s[0])])
             ## try:
             ##     self.twitter.update_status(status= u"{0}".format(message))
-            ##     sleep(1200)
+            ##     sleep(randint(1200,1800))
             ## except TwythonError as err:
             ##     print err
             ##     sleep(480)
@@ -191,13 +209,16 @@ class D(Thread):
 if __name__ == "__main__":
     twitter = TwitBot(CONSUMER_KEY,CONSUMER_SECRET,
                       OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
-    r = twitter.twitter.get_mentions_timeline(include_rts = 0, since_id = 391541784721256448)
-    for tweet in r:
-        print 'Tweet from @%s Date: %s' % (tweet['user']['screen_name'].encode('utf-8'), tweet['created_at'])
-        print "Tweet id %s" % (tweet['id'])
-        print tweet['text'].encode('utf-8'), '\n'
+    ## r = twitter.twitter.get_mentions_timeline(include_rts = 0, since_id = 391541784721256448)
+    ## for tweet in r:
+    ##     print 'Tweet from @%s Date: %s' % (tweet['user']['screen_name'].encode('utf-8'), tweet['created_at'])
+    ##     print "Tweet id %s" % (tweet['id'])
+    ##     print tweet['text'].encode('utf-8'), '\n'
     
-    
+    y = twitter.get_replays()
+    for c in y:
+        print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
+        print c[2].encode('utf-8'), '\n'
     ## h = twitter.show_status(id=391313123053166592)
     ## for c in h:
     ##     print c,"=", h[c]

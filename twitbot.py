@@ -29,13 +29,19 @@ class TwitBot(object):
         #last tweet id for query "xахол"
         self.jd = [391091716893458433]
 
+        #last mentions id
+        self.m_id = 0 
+
         #list of time_of_days, when bot should update status
         self.time = [(4, 59), (17, 59), (19, 59)]
         
 
     def run_search(self, query, text):
-        self.query = query 
-        result =  self.twitter.search(q=query)
+        self.query = query
+        try:
+            result =  self.twitter.search(q=query)
+        except TwythonError as e:
+            print e 
         if result:
             
 
@@ -57,6 +63,8 @@ class TwitBot(object):
             ## for user in users:
             ##     self.update_status(text,user)
             sleep(5)
+        else:
+            pass 
             
     def update_status(self, text, user):
         q_id = self.id if self.query == u"хохол" else self.jd
@@ -77,20 +85,45 @@ class TwitBot(object):
     def show_status(self,*args, **kwargs):
         return self.twitter.show_status(*args, **kwargs)
 
+    def update_dirty_status(self, name, id):
+        answers = [ u"Ты еще и ругаешься",
+                    u"Попросил бы без оскорблений",
+                    u"Очень грубо",
+                    u"Кто так обзывается, сам так называется",
+                    u"Сколько мата тьфу ты бля"
+                  ] 
+              
+        try:
+            self.twitter.update_status(status= u"@{0} {1}".format(
+                                       name, choice(answers)),
+                                      in_reply_to_status_id=id)
+            sleep(140 + randint(0,120))
+            
+        except TwythonError as err:
+            print err
+            sleep (180)
 
+ 
+    def retweet(self,id):
+        pass 
+        
     def get_replays(self,tweet):
         dirty_list = [u"хуй", u"пидор",u"пидар", u"пидр",
                       u"бля", u"блядь", u"сука",u"ебень",
                       u"гондон", u"гандон", u"шлюха",
                       u"чмо", u"залупа", u"eблан",
                       u"козел", u"казел", u"козлина",
-                      u"тварь"
+                      u"тварь", u"долбоеб", u"бандеровец",
+                      u"блять", u"уеби", u"бендеровец"
                      ]
         
-        
+        h = {0: self.retweet,
+             1: self.update_status}
         def is_shit(tweet):
+            t = tweet.lower()
             for word in dirty_list:
-                if word in tweet:
+                
+                if word in t:
                     return word
                 
             return False
@@ -158,10 +191,12 @@ class D(Thread):
 if __name__ == "__main__":
     twitter = TwitBot(CONSUMER_KEY,CONSUMER_SECRET,
                       OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
-    z = u"хуй"
-    t = u"пошел на хуй "
-    print z in t
-    print twitter.get_replays(t)
+    r = twitter.twitter.get_mentions_timeline(include_rts = 0, since_id = 391541784721256448)
+    for tweet in r:
+        print 'Tweet from @%s Date: %s' % (tweet['user']['screen_name'].encode('utf-8'), tweet['created_at'])
+        print "Tweet id %s" % (tweet['id'])
+        print tweet['text'].encode('utf-8'), '\n'
+    
     
     ## h = twitter.show_status(id=391313123053166592)
     ## for c in h:

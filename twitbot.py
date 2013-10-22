@@ -30,7 +30,7 @@ class TwitBot(object):
         self.jd = [391091716893458433]
 
         #last mentions id
-        self.m_id = 0 
+        self.m_id = 392146345320280064
 
         #list of time_of_days, when bot should update status
         self.time = [(4, 59), (17, 59), (19, 59)]
@@ -106,7 +106,7 @@ class TwitBot(object):
  
     def retweet(self,id):
         try:
-            self.twitter.retweet(id)
+            self.twitter.retweet(id=id)
             sleep(randint(60,180))
         except TwythonError as e:
             print e
@@ -130,13 +130,15 @@ class TwitBot(object):
                 if word in t:
                     return word
             return False
-        since_id = self.m_id
+        
         try:
-            repl = self.twitter.get_mentions_timeline(include_rts = 0
-                                                 )
+            repl = self.twitter.get_mentions_timeline(include_rts = 0,
+                                                      since_id = self.m_id)
+
             if repl:
                 repl =[(c["id"],c["user"]["screen_name"],c["text"]) for c
                        in repl if u"RT" not in c["text"]]
+                self.m_id = repl[-1][0]
                 repl = filter(is_shit,repl)
                 if repl:
                     for tw in repl:
@@ -146,7 +148,7 @@ class TwitBot(object):
         except TwythonError as err:
             print err
             sleep(360)
-        return is_shit(tweet)
+        
             
 
 

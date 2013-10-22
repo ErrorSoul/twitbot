@@ -27,7 +27,7 @@ class TwitBot(object):
         self.id = [391240789764112385]
 
         #last tweet id for query "xахол"
-        self.jd = [391091716893458433]
+        self.jd = [392185398987726848]
 
         #last mentions id
         self.m_id = 392146345320280064
@@ -125,8 +125,8 @@ class TwitBot(object):
                                                     since_id = self.t_id)
                  tw = [c["id"] for c in r]
                  self.t_id = tw[-1]
-
-                 map(self.retweet, filter(lambda x:x % 7 == 0, tw))
+                 if randint(0,7) == 3:
+                     map(self.retweet, filter(lambda x:x % 7 == 0, tw))
 
                  if randint(0,7) == 3:
                      map(self.favorite, filter(lambda x: x%3 == 0, tw))
@@ -134,7 +134,7 @@ class TwitBot(object):
                  for tweet in r:
                      print 'Tweet from @%s Date: %s' % (tweet['user']['screen_name'].encode('utf-8'), tweet['created_at'])
                      print "Tweet id %s" % (tweet['id'])
-                     print tweet['text'].encode('utf-8'), '\n'
+                     print tweet['text'].encode('utf-8'),'\n'
                  sleep(30)
             except TwythonError as err:
                 print err
@@ -217,7 +217,7 @@ class TwitBot(object):
         check_time = filter(part_of_day, self.time)
         if check_time:
             print "check_time"
-            message =  choice(text[self.time.index(s[0])])
+            message =  choice(text[self.time.index(check_time[0])])
             try:
                 self.twitter.update_status(status= u"{0}".format(message))
                 sleep(randint(1200,1800))

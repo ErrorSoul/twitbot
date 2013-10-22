@@ -32,6 +32,9 @@ class TwitBot(object):
         #last mentions id
         self.m_id = 392146345320280064
 
+        #last timelines tweet id
+        self.t_id = 392659529877696512
+
         #list of time_of_days, when bot should update status
         self.time = [(4, 59), (17, 59), (19, 59)]
         
@@ -41,9 +44,9 @@ class TwitBot(object):
         try:
             result =  self.twitter.search(q=query)
         except TwythonError as e:
-            print e 
+            print e
+
         if result:
-            
 
             #users = [(tweet id, user screen_name)]
             users = [(int(c["id"]), c["user"]["screen_name"])
@@ -59,12 +62,12 @@ class TwitBot(object):
             users = sorted(users)
             print users
             
-            print "#" * 30
+            print "#" * 40
             ## for user in users:
             ##     self.update_status(text,user)
             sleep(randint(60,240))
         else:
-            pass 
+            sleep(randint(240, 480))
             
     def update_status(self, text, user):
         q_id = self.id if self.query == u"хохол" else self.jd
@@ -89,21 +92,42 @@ class TwitBot(object):
         answers = [ u"Ты еще и ругаешься",
                     u"Попросил бы без оскорблений",
                     u"Очень грубо",
+                    u"А можно без мата?",
                     u"Кто так обзывается, сам так называется",
-                    u"Сколько мата тьфу ты бля"
+                    u"Сколько мата тьфу ты, бля"
                   ] 
               
         try:
             self.twitter.update_status(status= u"@{0} {1}".format(
                                        name, choice(answers)),
                                       in_reply_to_status_id=id)
-            sleep(randint(140,260))
+            sleep(randint(140,280))
             
         except TwythonError as err:
             print err
-            sleep (180)
+            sleep (280)
 
- 
+
+
+    def home_timeline(self):
+        hour = datetime.now().hour
+        if hour in range(0,3) or range(9,24):
+            
+        try:
+             r = self.twitter.get_home_timeline(count= 30,exclude_replies = 1,
+                                                since_id = self.t_id)
+             for tweet in r:
+                 print 'Tweet from @%s Date: %s' % (tweet['user']['screen_name'].encode('utf-8'), tweet['created_at'])
+                 print "Tweet id %s" % (tweet['id'])
+                 print tweet['text'].encode('utf-8'), '\n'
+             sleep(30)
+        except TwythonError as err:
+            print err
+            sleep(300)
+
+
+
+
     def retweet(self,id):
         try:
             self.twitter.retweet(id=id)
@@ -139,12 +163,13 @@ class TwitBot(object):
                 repl =[(c["id"],c["user"]["screen_name"],c["text"]) for c
                        in repl if u"RT" not in c["text"]]
                 self.m_id = repl[-1][0]
-                repl = filter(is_shit,repl)
+                repl = filter(is_shit, repl)
                 if repl:
                     for tw in repl:
-                       ( self.retweet(tw[0]) if randint(0,1)
-                         else self.update_dirty_status(tw[1],tw[0]))
-                return repl 
+                       (self.retweet(tw[0]) if randint(0,1)
+                        else self.update_dirty_status(tw[1],tw[0]))
+                return repl
+            return repl 
         except TwythonError as err:
             print err
             sleep(360)
@@ -185,7 +210,7 @@ class TwitBot(object):
             ##     print err
             ##     sleep(480)
         else:
-            sleep(10)
+            sleep(randint (1200,1800))
 
 class T_date(Thread):
     """Class for update status in certain time"""
@@ -198,9 +223,16 @@ class T_date(Thread):
             self.twitter.date_status(TEXT)
     
 class D(Thread):
+    def __init__(self, twitter):
+        Thread.__init__(self)
+        self.twitter= twitter
+        
+
     def p(self):
         a = datetime.now()
+        
         print "CURRENT TIME ==> {0}".format(a)
+        self.twitter.home_timeline()
         sleep (6)
         
     def run(self):
@@ -211,34 +243,30 @@ class D(Thread):
 if __name__ == "__main__":
     twitter = TwitBot(CONSUMER_KEY,CONSUMER_SECRET,
                       OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
-    ## r = twitter.twitter.get_mentions_timeline(include_rts = 0, since_id = 391541784721256448)
-    ## for tweet in r:
-    ##     print 'Tweet from @%s Date: %s' % (tweet['user']['screen_name'].encode('utf-8'), tweet['created_at'])
-    ##     print "Tweet id %s" % (tweet['id'])
-    ##     print tweet['text'].encode('utf-8'), '\n'
+   
     
-    y = twitter.get_replays()
-    for c in y:
-        print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
-        print c[2].encode('utf-8'), '\n'
-    ## h = twitter.show_status(id=391313123053166592)
-    ## for c in h:
-    ##     print c,"=", h[c]
-    ## a = twitter.my_reetwets()
-    ## print a
-    ## for c in a:
-    ##     if u"хохол" in c[1]:
-    ##         print c[1]
-    ##         print "*" * 20
-    ## d = D()
-    ## d.daemon = True
-    ## d.start()
+####################
+
+
+    ## y = twitter.get_replays()
+    ## for c in y:
+    ##     print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
+    ##     print c[2].encode('utf-8'), '\n'
+
+####################
+
+
+        
+    
+    d = D(twitter)
+    d.daemon = True
+    d.start()
     ## t = T_date(twitter)
     ## t.daemon = True
     ## t.start()
-    ## while True:
-    ##     #twitter.date_status(text)
-    ##     for query in QUERYS:
-    ##         twitter.run_search(query,replays)
-    ##         sleep(480)
+    while True:
+        #twitter.date_status(text)
+        for query in QUERYS:
+            twitter.run_search(query,replays)
+            sleep(60)
     ##     sleep(5)

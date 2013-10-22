@@ -119,7 +119,7 @@ class TwitBot(object):
         hour = datetime.now().hour
         if (hour in range(0,3) or range(9,24)
             and hour % 4 == 0):
-            
+            print "CHECK TIMELINE UPDATES"
             try:
                  r = self.twitter.get_home_timeline(count= 30,exclude_replies = 1,
                                                     since_id = self.t_id)
@@ -139,7 +139,8 @@ class TwitBot(object):
             except TwythonError as err:
                 print err
                 sleep(300)
-
+        else:
+            print "NO TIMELINE UPDATES"
 
 
 
@@ -263,12 +264,12 @@ if __name__ == "__main__":
    
     
 
-    d = D(twitter)
-    d.daemon = True
-    d.start()
-    ## t = T_date(twitter)
-    ## t.daemon = True
-    ## t.start()
+    ## d = D(twitter)
+    ## d.daemon = True
+    ## d.start()
+    t = T_date(twitter)
+    t.daemon = True
+    t.start()
     while True:
         twitter.home_timeline()
         #twitter.date_status(text)

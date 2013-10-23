@@ -133,19 +133,20 @@ class TwitBot(object):
             try:
                  result = self.twitter.get_home_timeline(count= 30,exclude_replies = 1,
                                                          since_id = self.t_id)
-                 tw = [tweet["id"] for tweet in result if tweet['user']['screen_name'] != u"ghohol"]
-                 self.t_id = tw[0]
-                 if randint(0,7) == 3:
-                     map(self.retweet, filter(lambda x:x % 7 == 0, tw))
+                 if result:
+                     tw = [tweet["id"] for tweet in result if tweet['user']['screen_name'] != u"ghohol"]
+                     self.t_id = tw[0]
+                     if randint(0,7) == 3:
+                         map(self.retweet, filter(lambda x:x % 7 == 0, tw))
 
-                 if randint(0,7) == 3:
-                     map(self.favorite, filter(lambda x: x%5 == 0, tw))
-                 #this part for debug (delete)
-                 for tweet in result:
-                     print 'Tweet from @%s Date: %s' % (tweet['user']['screen_name'].encode('utf-8'), tweet['created_at'])
-                     print "Tweet id %s" % (tweet['id'])
-                     print tweet['text'].encode('utf-8'),'\n'
-                 sleep(300)
+                     if randint(0,7) == 3:
+                         map(self.favorite, filter(lambda x: x%5 == 0, tw))
+                     #this part for debug (delete)
+                     for tweet in result:
+                         print 'Tweet from @%s Date: %s' % (tweet['user']['screen_name'].encode('utf-8'), tweet['created_at'])
+                         print "Tweet id %s" % (tweet['id'])
+                         print tweet['text'].encode('utf-8'),'\n'
+                     sleep(300)
             except TwythonError as err:
                 print err
                 sleep(300)

@@ -71,7 +71,7 @@ class TwitBot(object):
         if result:
             users = self.get_users(result)
 
-            if replies_count < 31:
+            if self.replies_count < 31:
                 
                 for user in users:
                     self.update_status(text,user)

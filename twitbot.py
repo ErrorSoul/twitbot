@@ -71,7 +71,7 @@ class TwitBot(object):
         if result:
             users = self.get_users(result)
 
-            if self.replies_count < 31:
+            if replies_count < 31:
                 
                 for user in users:
                     self.update_status(text,user)
@@ -134,7 +134,7 @@ class TwitBot(object):
                  result = self.twitter.get_home_timeline(count= 30,exclude_replies = 1,
                                                          since_id = self.t_id)
                  tw = [tweet["id"] for tweet in result if tweet['user']['screen_name'] != u"ghohol"]
-                 self.t_id = tw[-1]
+                 self.t_id = tw[0]
                  if randint(0,7) == 3:
                      map(self.retweet, filter(lambda x:x % 7 == 0, tw))
 
@@ -208,7 +208,7 @@ class TwitBot(object):
             if repl:
                 repl =[(c["id"],c["user"]["screen_name"],c["text"]) for c
                        in repl if u"RT" not in c["text"]]
-                self.m_id = repl[-1][0]
+                self.m_id = repl[0][0]
                 repl = filter(is_shit, repl)
                 if repl:
                     for tw in repl:
@@ -246,11 +246,11 @@ class TwitBot(object):
                         if self.id[0]:
                             complete("self.id")
                             
-                self.t_id = self.twitter.get_home_timeline(exclude_replies = 1)[-1]["id"]
+                self.t_id = self.twitter.get_home_timeline(exclude_replies = 1)[0]["id"]
                 if self.t_id:
                     complete("self.t_id")
 
-                self.m_id =  self.twitter.get_mentions_timeline(count=30,include_rts = 0)[-1]["id"]
+                self.m_id =  self.twitter.get_mentions_timeline(count=30, include_rts = 0)[0]["id"]
                 if self.m_id:
                     complete("self.m_id")
                 

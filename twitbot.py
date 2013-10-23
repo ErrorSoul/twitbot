@@ -250,7 +250,7 @@ class TwitBot(object):
                 if self.t_id:
                     complete("self.t_id")
 
-                self.m_id =  self.twitter.get_mentions_timeline (include_rts = 0)[-1]["id"]
+                self.m_id =  self.twitter.get_mentions_timeline(count=30,include_rts = 0)[-1]["id"]
                 if self.m_id:
                     complete("self.m_id")
                 

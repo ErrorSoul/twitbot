@@ -42,6 +42,10 @@ class TwitBot(object):
         self.replies_limit = 0
         self.replies_count = 35
         self.flag = True
+
+        #users victims
+        self.users = (u"kulybyshev", u"captein_treniki",u"fe_city_boy",
+                      u"1badd", u"Doppler_Effectt", u"koffboy")
         
     
     def get_users(self, result, debug = 0):

@@ -136,7 +136,7 @@ class TwitBot(object):
                     self.replies_limit = 12
                 self.replies_count = 0
                 self.flag = False
-        self.update_replies_count(hour)
+        update_replies_count(hour)
                 
         if (hour in range(0,3) or range(9,24)
             and hour % 4 == 0):

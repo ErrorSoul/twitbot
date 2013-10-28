@@ -1,4 +1,4 @@
-#coding: utf-8
+#coding: utf-8 
 
 from twython import Twython, TwythonError 
 from random import choice, randint 
@@ -36,7 +36,7 @@ class TwitBot(object):
         self.t_id = 0
 
         #list of time_of_days, when bot should update status
-        self.time = [(4, 59), (17, 59), (19, 59)]
+        self.time = [(4, 55), (17, 55), (19, 55)]
 
         #count of replies of day
         self.replies_limit = 0
@@ -65,7 +65,9 @@ class TwitBot(object):
             print users
             print "#" * 40,'\n'
         return users
+
 ##################################RUN SEARCH############################################        
+
     def run_search(self, query, text):
         self.query = query
         try:
@@ -100,8 +102,10 @@ class TwitBot(object):
             except TwythonError as err:
                 print err
                 sleep(400)
+
 ################################################################################
-    def show_status(self,*args, **kwargs):
+
+    def show_status(self, *args, **kwargs):
         return self.twitter.show_status(*args, **kwargs)
 
     def update_dirty_status(self, name, id):
@@ -125,6 +129,7 @@ class TwitBot(object):
 
    
 ################################HOME TIMELINE######################################
+
     def home_timeline(self):
         hour = datetime.now().hour
 
@@ -137,6 +142,8 @@ class TwitBot(object):
                 self.replies_count = 0
                 self.flag = False
         update_replies_count(hour)
+        print self.replies_count, "count"
+        print self.replies_limit, "limit"
                 
         if (hour in range(0,3) or range(9,24)
             and hour % 4 == 0):
@@ -233,7 +240,19 @@ class TwitBot(object):
         except TwythonError as err:
             print err
             sleep(360)
+
+########################################STEAL TWEET ################################
+
+    def steal_tweets(self):
+        #take my tweets 
+        ## my_tweets = self.twitter.get_user_timeline(count=30,exclude_replies=1)
+        ## my_tweets = [c["text"] for c in my_tweets]
+        #take victim's tweets
+        victims_tweets = map(self.get_victims_timeline, self.users)
+        print victims_tweets
         
+        
+      
             
 
 ########################################START########################################
@@ -271,6 +290,7 @@ class TwitBot(object):
             except TwythonError as err:
                 print err
                 sleep(480)
+
 ####################################################################################                    
         
     def my_reetwets(self):
@@ -282,6 +302,17 @@ class TwitBot(object):
 
     def get_followers_ids(self):
         return self.twitter.get_followers_ids()
+
+    def get_victims_timeline(self, name):
+        try:
+            tweets =  self.twitter.get_user_timeline(screen_name=name, exclude_replies=1, count=200)[-1:-11:-1]
+            return [c["text"] for c in tweets if not c["entities"]['urls']]
+        except TwythonError as err:
+            print err
+            sleep(30)
+        
+        
+        
 
     def delete_replies(self):
         a = datetime.now().hour
@@ -361,25 +392,29 @@ if __name__ == "__main__":
     twitter = TwitBot(CONSUMER_KEY,CONSUMER_SECRET,
                       OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
    
-    
-    twitter.start()
-    
-    ## d = D(twitter)
-    ## d.daemon = True
-    ## d.start()
-    t = T_date(twitter)
-    t.daemon = True
-    t.start()
-    while True:
-        twitter.delete_replies()
-        twitter.home_timeline()
-        #twitter.date_status(text)
-        for query in QUERYS:
-            twitter.run_search(query,replays)
-            sleep(70)
-        sleep(randint(60,120))
-        y = twitter.get_replays()
-        for c in y:
-            print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
-            print c[2].encode('utf-8'), '\n'
-        
+    print  twitter.replies_count
+    print  twitter.replies_limit
+    print twitter.show_status(id = 384799598469857280)["entities"]
+    print twitter.steal_tweets()
+    #d = twitter.twitter.get_user_timeline(screen_name=u"leelovaja")
+  
+    ##twitter.start()    
+    ## ## d = D(twitter)
+    ## ## d.daemon = True
+    ## ## d.start()
+    ## t = T_date(twitter)
+    ## t.daemon = True
+    ## t.start()
+    ## while True:
+    ##     twitter.delete_replies()
+    ##     twitter.home_timeline()
+    ##     #twitter.date_status(text)
+    ##     for query in QUERYS:
+    ##         twitter.run_search(query, replays)
+    ##         sleep(70)
+    ##     sleep(randint(60,120))
+    ##     y = twitter.get_replays()
+    ##     for c in y:
+    ##         print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
+    ##         print c[2].encode('utf-8'), '\n'
+

@@ -244,12 +244,18 @@ class TwitBot(object):
 ########################################STEAL TWEET ################################
 
     def steal_tweets(self):
-        #take my tweets 
-        ## my_tweets = self.twitter.get_user_timeline(count=30,exclude_replies=1)
-        ## my_tweets = [c["text"] for c in my_tweets]
+        #take my tweets
+        try:
+            my_tweets = self.twitter.get_user_timeline(count=30,exclude_replies=1)
+        except TwythonError as err:
+            print err
+            sleep(30)
+        my_tweets = [c["text"] for c in my_tweets]
+        print my_tweets
         #take victim's tweets
-        victims_tweets = map(self.get_victims_timeline, self.users)
-        print victims_tweets
+        get_victims_timeline = self.get_victims_timeline(my_tweets)
+        victims_tweets = map(get_victims_timeline, self.users)
+        return victims_tweets 
         
         
       
@@ -303,13 +309,25 @@ class TwitBot(object):
     def get_followers_ids(self):
         return self.twitter.get_followers_ids()
 
-    def get_victims_timeline(self, name):
-        try:
-            tweets =  self.twitter.get_user_timeline(screen_name=name, exclude_replies=1, count=200)[-1:-11:-1]
-            return [c["text"] for c in tweets if not c["entities"]['urls']]
-        except TwythonError as err:
-            print err
-            sleep(30)
+    def get_victims_timeline(self, text):
+        def victims_tweets(name):
+            try:
+                tweets =  self.twitter.get_user_timeline(screen_name=name, exclude_replies=1, count=200)[-1:-11:-1]
+                print "dddd"
+                tweets = [c for c in tweets if (not c["entities"]['urls'] and
+                                              len(c['entities'])==4 and
+                                              not c['entities']['user_mentions']
+                                              )]
+                
+               
+                d = [c['text'] for c in tweets if c['text'] not in text][-1]
+                print d
+                return d
+            except TwythonError as err:
+                print err, "ddddddddd"
+                sleep(30)
+        return victims_tweets
+       
         
         
         
@@ -395,7 +413,8 @@ if __name__ == "__main__":
     print  twitter.replies_count
     print  twitter.replies_limit
     print twitter.show_status(id = 384799598469857280)["entities"]
-    print twitter.steal_tweets()
+    for tweet in twitter.steal_tweets():
+        print tweet.encode('utf-8'),"\n"
     #d = twitter.twitter.get_user_timeline(screen_name=u"leelovaja")
   
     ##twitter.start()    

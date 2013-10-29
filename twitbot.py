@@ -146,7 +146,7 @@ class TwitBot(object):
         print self.replies_count, "count"
         print self.replies_limit, "limit"
                 
-        if (hour in range(0,3) or range(9,24)
+        if (hour in range(0,3) or hour in range(9,24)
             and hour % 4 == 0):
             
                 
@@ -246,7 +246,8 @@ class TwitBot(object):
 
     def steal_tweets(self):
         hour= datetime.now().hour
-        if hour == 4 or 19 :
+        print hour, "FGGGGGGGGGGGGGGGGJJGJGJGJGJJJJJJJJJJJJJJJJJ"
+        if hour == 4 or hour ==  19 :
             print "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
             
         

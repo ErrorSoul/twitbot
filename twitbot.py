@@ -334,7 +334,7 @@ class TwitBot(object):
                 
                
                 d = [c['text'] for c in tweets if c['text'] not in text][-1]
-                print d
+                print d.encode('utf-8')
                 return d
             except TwythonError as err:
                 print err, "ddddddddd"

@@ -136,7 +136,7 @@ class TwitBot(object):
 
         def update_replies_count(hour):
             if self.flag:
-                if hour == 17 :
+                if hour == 20:
                     self.replies_limit = 27
                 elif hour == 10:
                     self.replies_limit = 12

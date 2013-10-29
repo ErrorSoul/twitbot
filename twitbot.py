@@ -247,6 +247,7 @@ class TwitBot(object):
     def steal_tweets(self):
         hour= datetime.now().hour
         if hour == 4 or 19 :
+            print "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
             
         
             try:

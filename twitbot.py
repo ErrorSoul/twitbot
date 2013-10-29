@@ -78,13 +78,14 @@ class TwitBot(object):
 
         if result:
             users = self.get_users(result)
-
-            if self.replies_count < self.replies_limit:
-                
-                for user in users:
-                    self.update_status(text,user)
-                    self.replies_count +=1
-                sleep(randint(180,440))
+            for user in users:
+                    if self.replies_count < self.replies_limit:
+                        self.update_status(text,user)
+                        self.replies_count +=1
+                    else:
+                        break
+                    
+            sleep(randint(180,210))
         else:
             sleep(randint(240, 480))
             
@@ -136,7 +137,7 @@ class TwitBot(object):
 
         def update_replies_count(hour):
             if self.flag:
-                if hour == 20:
+                if hour == 17:
                     self.replies_limit = 27
                 elif hour == 10:
                     self.replies_limit = 12

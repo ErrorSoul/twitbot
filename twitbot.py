@@ -366,7 +366,7 @@ class TwitBot(object):
         check_time = filter(part_of_day, self.time)
         if check_time:
             print "check_time"
-            message =  choice(text[self.time.index(check_time[0])])
+            message = choice(text[self.time.index(check_time[0])])
             try:
                 self.twitter.update_status(status= u"{0}".format(message))
                 sleep(randint(1600, 2400))

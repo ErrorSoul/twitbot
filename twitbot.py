@@ -83,7 +83,7 @@ class TwitBot(object):
                 
                 for user in users:
                     self.update_status(text,user)
-                    replies_count +=1
+                    self.replies_count +=1
                 sleep(randint(180,440))
         else:
             sleep(randint(240, 480))

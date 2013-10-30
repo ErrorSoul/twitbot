@@ -11,8 +11,8 @@ from text import replays, night, afternoon, morning
 
 CONSUMER_KEY       = "Dc8GNbgcOklJie3TV2V0A"
 CONSUMER_SECRET    = "QducleApTwunlqZmNM0AdhwlhWpoDJ44agk6UnPs"
-OAUTH_TOKEN        = "1964645443-7XZiMnTEN0fp5e2CvuyYrsM8YralkeCfya6y2Th"
-OAUTH_TOKEN_SECRET = "hcA1vYDtB5e3XVFHRzunNP5VBO0JBvxDGKeAIab3w"
+OAUTH_TOKEN        = "1964645443-mmEaq9TWNGoXoZ9glFrE96Yx9ktHHkCRUxCFfms"
+OAUTH_TOKEN_SECRET = "2PbSnYpJdGJdv1TF1F3eCF5SRdigCcwVYRpvsrfELta0t"
 QUERYS = [u"хахол", u"хохол"]
 TEXT = [morning, afternoon, night]
 
@@ -30,6 +30,7 @@ class TwitBot(object):
         #last tweet id for query "xахол"
         self.jd = [0]
 
+        
         #last mentions id
         self.m_id = 0
 
@@ -139,10 +140,12 @@ class TwitBot(object):
             if self.flag:
                 if hour == 17:
                     self.replies_limit = 27
+                    self.flag = False
                 elif hour == 10:
                     self.replies_limit = 12
+                    self.flag = False
                 self.replies_count = 0
-                self.flag = False
+                
         update_replies_count(hour)
         print self.replies_count, "count"
         print self.replies_limit, "limit"
@@ -156,7 +159,8 @@ class TwitBot(object):
                  result = self.twitter.get_home_timeline(count= 30,exclude_replies = 1,
                                                          since_id = self.t_id)
                  if result:
-                     tw = [tweet["id"] for tweet in result if tweet['user']['screen_name'] != u"ghohol"]
+                     tw = [tweet["id"] for tweet in result if (tweet['user']['screen_name'] != u"ghohol" and
+                                                                not tweet['entities']['user_mentions'])]
                      self.t_id = tw[0]
                      if randint(0,7) == 3:
                          map(self.retweet, filter(lambda x:x % 7 == 0, tw))
@@ -362,6 +366,15 @@ class TwitBot(object):
                 sleep(randint(125, 200))
         else:
             print "NO CLEAN"
+
+
+    def get_dm(self):
+        try:
+            dm = self.twitter.get_direct_messages()
+            return dm 
+        except TwythonError as er:
+            print er 
+            
                 
 ###############################DATE STATUS############################################
 
@@ -428,7 +441,11 @@ if __name__ == "__main__":
    
    
   
-    twitter.start()    
+    twitter.start()
+    ## dm = twitter.get_dm()
+    ## for c in dm:
+    ##     print "Direct message from @{0}: {1}".format(c["sender_screen_name"],
+    ##                                                  c['text'].encode('utf-8'))    
     d = D(twitter)
     d.daemon = True
     d.start()

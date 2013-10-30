@@ -82,7 +82,7 @@ class TwitBot(object):
             for user in users:
                     if self.replies_count < self.replies_limit:
                         self.update_status(text,user)
-                        self.replies_count +=1
+                        
                     else:
                         break
                     
@@ -99,6 +99,7 @@ class TwitBot(object):
                 self.twitter.update_status(status= u"@{0} {1}".format(
                                            user[1], choice(text)),
                                            in_reply_to_status_id=user[0])
+                self.replies_count +=1
                 #save last tweet id 
                 q_id[0] = user[0]
                 sleep(randint(200,400))

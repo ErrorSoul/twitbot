@@ -102,7 +102,7 @@ class TwitBot(object):
                 self.replies_count +=1
                 #save last tweet id 
                 q_id[0] = user[0]
-                sleep(randint(200,400))
+                sleep(randint(400,560))
             except TwythonError as err:
                 print err
                 sleep(400)

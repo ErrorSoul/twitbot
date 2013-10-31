@@ -140,10 +140,10 @@ class TwitBot(object):
         def update_replies_count(hour):
             if self.flag:
                 if hour == 17:
-                    self.replies_limit = 27
+                    self.replies_limit = randint(0,12)
                     self.flag = False
                 elif hour == 10:
-                    self.replies_limit = 12
+                    self.replies_limit = randint(0,12)
                     self.flag = False
                 self.replies_count = 0
                 

@@ -253,7 +253,7 @@ class TwitBot(object):
     def steal_tweets(self):
         hour= datetime.now().hour
         print hour, "FGGGGGGGGGGGGGGGGJJGJGJGJGJJJJJJJJJJJJJJJJJ"
-        if hour == 5 or hour ==  15 :
+        if hour == 5 or hour ==  16 :
             print "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
             
         
@@ -269,7 +269,7 @@ class TwitBot(object):
                 victims_tweets = map(get_victims_timeline, self.users)
                 for tweet in victims_tweets:
                     self.twitter.update_status(status=tweet)
-                    sleep(randint(3600,4000))
+                    sleep(3600)
 
             except TwythonError as err:
                 print err

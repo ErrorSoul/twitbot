@@ -258,24 +258,24 @@ class TwitBot(object):
             
         
             try:
-                #take my tweets
+                #get my tweets
                 my_tweets = self.twitter.get_user_timeline(count=30,exclude_replies=1)
 
                 my_tweets = [c["text"] for c in my_tweets]
                 print my_tweets
 
-                #take victim's tweets
+                #get victim's tweets
                 get_victims_timeline = self.get_victims_timeline(my_tweets)
                 victims_tweets = map(get_victims_timeline, self.users)
                 for tweet in victims_tweets:
                     self.twitter.update_status(status=tweet)
-                    sleep(3600)
+                    sleep(randint(3600,4200))
 
             except TwythonError as err:
                 print err
                 sleep(180)
         else:
-            sleep(randint(3600, 4200))
+            sleep(3600)
        
         
         

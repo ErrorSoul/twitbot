@@ -259,7 +259,7 @@ class TwitBot(object):
         
             try:
                 #get my tweets
-                my_tweets = self.twitter.get_user_timeline(count=30,exclude_replies=1)
+                my_tweets = self.twitter.get_user_timeline(count=70,exclude_replies=1)
 
                 my_tweets = [c["text"] for c in my_tweets]
                 print my_tweets
@@ -333,7 +333,7 @@ class TwitBot(object):
     def get_victims_timeline(self, text):
         def victims_tweets(name):
             try:
-                tweets =  self.twitter.get_user_timeline(screen_name=name, exclude_replies=1, count=200)[-1:-11:-1]
+                tweets =  self.twitter.get_user_timeline(screen_name=name, exclude_replies=1, count=200)[-1:-15:-1]
                 print "dddd"
                 tweets = [c for c in tweets if (not c["entities"]['urls'] and
                                               len(c['entities'])==4 and

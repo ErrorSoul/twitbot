@@ -46,8 +46,9 @@ class TwitBot(object):
         self.flag = True
 
         #users victims
-        self.users = (u"kulybyshev", u"captein_treniki",u"fe_city_boy",
-                      u"1badd", u"Doppler_Effectt", u"koffboy")
+        self.users = (u"kulybyshev", u"captein_treniki",
+                      u"fe_city_boy", u"1badd", u"@drunktwi",
+                      u"Doppler_Effectt", u"koffboy")
         
     
     def get_users(self, result, debug = 0):

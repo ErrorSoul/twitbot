@@ -25,7 +25,7 @@ class TwitBot(object):
         self.twitter = Twython(c_key, c_secret, o_token, o_token_secret)
 
         #last tweet id for query "xохол"
-        self.id = [0]
+        self.id = [100]
 
         #last tweet id for query "xахол"
         self.jd = [0]

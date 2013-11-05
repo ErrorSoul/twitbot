@@ -375,8 +375,19 @@ class TwitBot(object):
             dm = self.twitter.get_direct_messages()
             return dm 
         except TwythonError as er:
-            print er 
-            
+            print er
+##################################UNFOLLOW######################################
+
+    def unfollow_who_not_follow_back(self):
+            #get friends ids
+            friends_ids = self.twitter.get_friends_ids()[u"ids"]
+            #get followers ids
+            followers_ids = self.twitter.get_followers_ids()[u"ids"]
+            #unfollowing list
+            destroy_list = [user_id for user_id in friends_ids 
+                            if user_id not in followers_ids] 
+            #map(self.destroy_friendship, destroy_list)
+            return  destroy_list          
                 
 ###############################DATE STATUS############################################
 
@@ -440,31 +451,40 @@ class D(Thread):
 if __name__ == "__main__":
     twitter = TwitBot(CONSUMER_KEY,CONSUMER_SECRET,
                       OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
+
+    l = [u"dontreallyexist", u"ZaxarBorisych", u"thestrangestguy",
+         u"saxageer", u"Gl1uk", u"poooovar",
+         u"AveMisha", u"loooh_pidrrr", u"AlcoHistory",
+         u"Doppler_Effectt", u"1morepandabear",u"fe_city_boy"]
+
+    for c in l:
+        print "User @{0} number is {1}".format(c, twitter.twitter.show_user(screen_name=c)['id'])
+    print len(twitter.unfollow_who_not_follow_back())
    
-   
+    print len(twitter.twitter.get_friends_ids()[u"ids"])
   
-    twitter.start()
+    #twitter.start()
     ## dm = twitter.get_dm()
     ## for c in dm:
     ##     print "Direct message from @{0}: {1}".format(c["sender_screen_name"],
-    ##                                                  c['text'].encode('utf-8'))    
-    d = D(twitter)
-    d.daemon = True
-    d.start()
-    t = T_date(twitter)
-    t.daemon = True
-    t.start()
-    while True:
-        twitter.delete_replies()
-        twitter.home_timeline()
-        #twitter.date_status(text)
-        for query in QUERYS:
-            twitter.run_search(query, replays)
-            sleep(70)
-        sleep(randint(60,120))
-        y = twitter.get_replays()
-        for c in y:
-            print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
-            print c[2].encode('utf-8'), '\n'
+    ##                                                  c['text'].encode('utf-8'))
+    ## d = D(twitter)
+    ## d.daemon = True
+    ## d.start()
+    ## t = T_date(twitter)
+    ## t.daemon = True
+    ## t.start()
+    ## while True:
+    ##     twitter.delete_replies()
+    ##     twitter.home_timeline()
+    ##     #twitter.date_status(text)
+    ##     for query in QUERYS:
+    ##         twitter.run_search(query, replays)
+    ##         sleep(70)
+    ##     sleep(randint(60,120))
+    ##     y = twitter.get_replays()
+    ##     for c in y:
+    ##         print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
+    ##         print c[2].encode('utf-8'), '\n'
 
 

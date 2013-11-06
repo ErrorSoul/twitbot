@@ -25,7 +25,7 @@ class TwitBot(object):
         self.twitter = Twython(c_key, c_secret, o_token, o_token_secret)
 
         #last tweet id for query "xохол"
-        self.id = [100]
+        self.id = [0]
 
         #last tweet id for query "xахол"
         self.jd = [0]
@@ -397,7 +397,7 @@ class TwitBot(object):
         current_time = datetime.now()
         print "current time = {0}".format(str(current_time))
         #this part for count_replies
-        if current_time.hour == 9:
+        if current_time.hour == 9 or current_time.hour == 16 :
             self.flag = True
         
         def part_of_day(time_of_day):

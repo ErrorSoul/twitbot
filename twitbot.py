@@ -260,7 +260,7 @@ class TwitBot(object):
         
             try:
                 #get my tweets
-                my_tweets = self.twitter.get_user_timeline(count=70,exclude_replies=1)
+                my_tweets = self.twitter.get_user_timeline(count=140, exclude_replies=1)
 
                 my_tweets = [c["text"] for c in my_tweets]
                 print my_tweets
@@ -379,15 +379,31 @@ class TwitBot(object):
 ##################################UNFOLLOW######################################
 
     def unfollow_who_not_follow_back(self):
-            #get friends ids
-            friends_ids = self.twitter.get_friends_ids()[u"ids"]
-            #get followers ids
-            followers_ids = self.twitter.get_followers_ids()[u"ids"]
-            #unfollowing list
-            destroy_list = [user_id for user_id in friends_ids 
-                            if user_id not in followers_ids] 
-            #map(self.destroy_friendship, destroy_list)
-            return  destroy_list          
+        data = datetime.now()
+        #clean followers every odd day 
+        if data.day % 2 == 0 and data.hour == 1:
+
+            print "UNFOLLOWING START"
+            
+            # "stars" id
+            stars_id = [462792965, 14774424, 344512640,
+                        265008715, 412493190, 254655960,
+                        179484444, 90647948, 408437933,
+                        98422492,  81297044,  250801581]
+            try:
+                #get friends ids
+                friends_ids = self.twitter.get_friends_ids()[u"ids"]
+                friends_ids = [id for id in friends_ids if id not in stars_id]
+                #get followers ids
+                followers_ids = self.twitter.get_followers_ids()[u"ids"]
+                #unfollowing list
+                destroy_list = [user_id for user_id in friends_ids 
+                                if user_id not in followers_ids] 
+                map(lambda x : self.destroy_friendship(user_id=x), destroy_list)
+            print "UNFOLLOWING END"
+            except TwythonError as er:
+                print er
+                sleep(60)          
                 
 ###############################DATE STATUS############################################
 
@@ -452,39 +468,44 @@ if __name__ == "__main__":
     twitter = TwitBot(CONSUMER_KEY,CONSUMER_SECRET,
                       OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
 
-    l = [u"dontreallyexist", u"ZaxarBorisych", u"thestrangestguy",
-         u"saxageer", u"Gl1uk", u"poooovar",
-         u"AveMisha", u"loooh_pidrrr", u"AlcoHistory",
-         u"Doppler_Effectt", u"1morepandabear",u"fe_city_boy"]
+    ## l = [u"dontreallyexist", u"ZaxarBorisych", u"thestrangestguy",
+    ##      u"saxageer", u"Gl1uk", u"poooovar",
+    ##      u"AveMisha", u"loooh_pidrrr", u"AlcoHistory",
+    ##      u"Doppler_Effectt", u"1morepandabear",u"fe_city_boy"]
+    ## d = []
 
-    for c in l:
-        print "User @{0} number is {1}".format(c, twitter.twitter.show_user(screen_name=c)['id'])
-    print len(twitter.unfollow_who_not_follow_back())
+    ## for c in l:
+    ##     user_id = twitter.twitter.show_user(screen_name=c)['id']
+    ##     d.append(user_id)
+    ##     print "User @{0} number is {1}".format(c, user_id)
+    ## print len(twitter.unfollow_who_not_follow_back())
    
-    print len(twitter.twitter.get_friends_ids()[u"ids"])
+    ## print len(twitter.twitter.get_friends_ids()[u"ids"])
   
-    #twitter.start()
+    twitter.start()
     ## dm = twitter.get_dm()
     ## for c in dm:
     ##     print "Direct message from @{0}: {1}".format(c["sender_screen_name"],
     ##                                                  c['text'].encode('utf-8'))
-    ## d = D(twitter)
-    ## d.daemon = True
-    ## d.start()
-    ## t = T_date(twitter)
-    ## t.daemon = True
-    ## t.start()
-    ## while True:
-    ##     twitter.delete_replies()
-    ##     twitter.home_timeline()
-    ##     #twitter.date_status(text)
-    ##     for query in QUERYS:
-    ##         twitter.run_search(query, replays)
-    ##         sleep(70)
-    ##     sleep(randint(60,120))
-    ##     y = twitter.get_replays()
-    ##     for c in y:
-    ##         print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
-    ##         print c[2].encode('utf-8'), '\n'
+
+    d = D(twitter)
+    d.daemon = True
+    d.start()
+    t = T_date(twitter)
+    t.daemon = True
+    t.start()
+    while True:
+        twitter.unfollow_who_not_follow_back()
+        twitter.delete_replies()
+        twitter.home_timeline()
+        #twitter.date_status(text)
+        for query in QUERYS:
+            twitter.run_search(query, replays)
+            sleep(70)
+        sleep(randint(60,120))
+        y = twitter.get_replays()
+        for c in y:
+            print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
+            print c[2].encode('utf-8'), '\n'
 
 

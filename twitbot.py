@@ -400,7 +400,7 @@ class TwitBot(object):
                 destroy_list = [user_id for user_id in friends_ids 
                                 if user_id not in followers_ids] 
                 map(lambda x : self.destroy_friendship(user_id=x), destroy_list)
-            print "UNFOLLOWING END"
+                print "UNFOLLOWING END"
             except TwythonError as er:
                 print er
                 sleep(60)          

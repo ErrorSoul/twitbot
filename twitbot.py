@@ -5,7 +5,6 @@ from twython import Twython, TwythonError
 from random import choice, randint 
 from datetime import datetime
 from threading import Thread
-from time import time as t
 from time import  sleep
 from text import replays, night, afternoon, morning
 
@@ -379,12 +378,11 @@ class TwitBot(object):
 ##################################UNFOLLOW######################################
 
     def unfollow_who_not_follow_back(self):
+
         data = datetime.now()
         #clean followers every odd day 
         if data.day % 2 == 0 and data.hour == 1:
-
             print "UNFOLLOWING START"
-            
             # "stars" id
             stars_id = [462792965, 14774424, 344512640,
                         265008715, 412493190, 254655960,
@@ -399,7 +397,7 @@ class TwitBot(object):
                 #unfollowing list
                 destroy_list = [user_id for user_id in friends_ids 
                                 if user_id not in followers_ids] 
-                map(lambda x : self.destroy_friendship(user_id=x), destroy_list)
+                map(lambda x : self.twitter.destroy_friendship(user_id=x), destroy_list)
                 print "UNFOLLOWING END"
             except TwythonError as er:
                 print er
@@ -467,6 +465,7 @@ class D(Thread):
 if __name__ == "__main__":
     twitter = TwitBot(CONSUMER_KEY,CONSUMER_SECRET,
                       OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
+   
 
     ## l = [u"dontreallyexist", u"ZaxarBorisych", u"thestrangestguy",
     ##      u"saxageer", u"Gl1uk", u"poooovar",
@@ -483,10 +482,10 @@ if __name__ == "__main__":
     ## print len(twitter.twitter.get_friends_ids()[u"ids"])
   
     twitter.start()
-    ## dm = twitter.get_dm()
-    ## for c in dm:
-    ##     print "Direct message from @{0}: {1}".format(c["sender_screen_name"],
-    ##                                                  c['text'].encode('utf-8'))
+    dm = twitter.get_dm()
+    for c in dm:
+        print "Direct message from @{0}: {1}".format(c["sender_screen_name"],
+                                                     c['text'].encode('utf-8'))
 
     d = D(twitter)
     d.daemon = True

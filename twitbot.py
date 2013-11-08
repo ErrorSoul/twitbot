@@ -64,7 +64,7 @@ class TwitBot(object):
         #sorted tweets from older to younger
         users = sorted(users)
         if not debug:
-            print users
+            print "last user", users[-1]
             print "#" * 40,'\n'
         return users
 
@@ -82,7 +82,6 @@ class TwitBot(object):
             for user in users:
                     if self.replies_count < self.replies_limit:
                         self.update_status(text,user)
-                        
                     else:
                         break
                     
@@ -139,13 +138,10 @@ class TwitBot(object):
 
         def update_replies_count(hour):
             if self.flag:
-                if hour == 17:
+                if hour == 10 or hour == 17:
                     self.replies_limit = randint(3,12)
                     self.flag = False
-                elif hour == 10:
-                    self.replies_limit = randint(3,12)
-                    self.flag = False
-                self.replies_count = 0
+                    self.replies_count = 0
                 
         update_replies_count(hour)
         print self.replies_count, "count"
@@ -164,15 +160,13 @@ class TwitBot(object):
                                                                 not tweet['entities']['user_mentions'])]
                      self.t_id = tw[0]
                      if randint(0,7) == 3:
+                         print "Try retweet"
                          map(self.retweet, filter(lambda x:x % 7 == 0, tw))
 
                      if randint(0,7) == 3:
+                         print "Try favourite"
                          map(self.favorite, filter(lambda x: x%5 == 0, tw))
-                     #this part for debug (delete)
-                     for tweet in result:
-                         print 'Tweet from @%s Date: %s' % (tweet['user']['screen_name'].encode('utf-8'), tweet['created_at'])
-                         print "Tweet id %s" % (tweet['id'])
-                         print tweet['text'].encode('utf-8'),'\n'
+                     
                      sleep(300)
             except TwythonError as err:
                 print err
@@ -239,6 +233,7 @@ class TwitBot(object):
                 self.m_id = repl[0][0]
                 repl = filter(is_shit, repl)
                 if repl:
+                    print "Try send mention for dirty reply"
                     for tw in repl:
                        (self.retweet(tw[0]) if randint(0,1)
                         else self.update_dirty_status(tw[1],tw[0]))
@@ -250,19 +245,15 @@ class TwitBot(object):
 
 ########################################STEAL TWEET ################################
 
-    def steal_tweets(self):
-        hour= datetime.now().hour
+    def steal_tweets(self, d):
+        hour = d.hour
         print hour, "FGGGGGGGGGGGGGGGGJJGJGJGJGJJJJJJJJJJJJJJJJJ"
         if hour == 5 or hour ==  15 :
-            print "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-            
-        
+            print "TIME TO STEAL TWEETS"
             try:
                 #get my tweets
                 my_tweets = self.twitter.get_user_timeline(count=140, exclude_replies=1)
-
                 my_tweets = [c["text"] for c in my_tweets]
-                print my_tweets
 
                 #get victim's tweets
                 get_victims_timeline = self.get_victims_timeline(my_tweets)
@@ -270,6 +261,7 @@ class TwitBot(object):
                 for tweet in victims_tweets:
                     self.twitter.update_status(status=tweet)
                     sleep(3600)
+                print "STEALING TWEETS IS OVER"
 
             except TwythonError as err:
                 print err
@@ -454,7 +446,7 @@ class D(Thread):
         a = datetime.now()
         
         print "CURRENT TIME ==> {0}".format(a)
-        self.twitter.steal_tweets()
+        self.twitter.steal_tweets(a)
         
         
     def run(self):
@@ -465,31 +457,14 @@ class D(Thread):
 if __name__ == "__main__":
     twitter = TwitBot(CONSUMER_KEY,CONSUMER_SECRET,
                       OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
-   
-
-    ## l = [u"dontreallyexist", u"ZaxarBorisych", u"thestrangestguy",
-    ##      u"saxageer", u"Gl1uk", u"poooovar",
-    ##      u"AveMisha", u"loooh_pidrrr", u"AlcoHistory",
-    ##      u"Doppler_Effectt", u"1morepandabear",u"fe_city_boy"]
-    ## d = []
-
-    ## for c in l:
-    ##     user_id = twitter.twitter.show_user(screen_name=c)['id']
-    ##     d.append(user_id)
-    ##     print "User @{0} number is {1}".format(c, user_id)
-    ## print len(twitter.unfollow_who_not_follow_back())
-   
-    ## print len(twitter.twitter.get_friends_ids()[u"ids"])
-  
+    #start twiter
     twitter.start()
-    dm = twitter.get_dm()
-    for c in dm:
-        print "Direct message from @{0}: {1}".format(c["sender_screen_name"],
-                                                     c['text'].encode('utf-8'))
-
+   
+    #init thread
     d = D(twitter)
     d.daemon = True
     d.start()
+    #init thread
     t = T_date(twitter)
     t.daemon = True
     t.start()
@@ -497,7 +472,6 @@ if __name__ == "__main__":
         twitter.unfollow_who_not_follow_back()
         twitter.delete_replies()
         twitter.home_timeline()
-        #twitter.date_status(text)
         for query in QUERYS:
             twitter.run_search(query, replays)
             sleep(70)

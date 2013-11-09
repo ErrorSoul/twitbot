@@ -13,8 +13,10 @@ CONSUMER_SECRET    = "QducleApTwunlqZmNM0AdhwlhWpoDJ44agk6UnPs"
 OAUTH_TOKEN        = "1964645443-mmEaq9TWNGoXoZ9glFrE96Yx9ktHHkCRUxCFfms"
 OAUTH_TOKEN_SECRET = "2PbSnYpJdGJdv1TF1F3eCF5SRdigCcwVYRpvsrfELta0t"
 QUERYS = [u"хахол", u"хохол"]
-TEXT = map(shuffle, [morning, afternoon, night])
-replays = shuffle(shuffle(replays))
+TEXT = [morning, afternoon, night]
+map(shuffle,TEXT)
+for c in range(3):
+    shuffle(replays)
 
 class TwitBot(object):
     

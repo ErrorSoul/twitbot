@@ -2,7 +2,7 @@
 #coding: utf-8 
 
 from twython import Twython, TwythonError 
-from random import choice, randint 
+from random import choice, randint, shuffle  
 from datetime import datetime
 from threading import Thread
 from time import  sleep
@@ -13,8 +13,8 @@ CONSUMER_SECRET    = "QducleApTwunlqZmNM0AdhwlhWpoDJ44agk6UnPs"
 OAUTH_TOKEN        = "1964645443-mmEaq9TWNGoXoZ9glFrE96Yx9ktHHkCRUxCFfms"
 OAUTH_TOKEN_SECRET = "2PbSnYpJdGJdv1TF1F3eCF5SRdigCcwVYRpvsrfELta0t"
 QUERYS = [u"хахол", u"хохол"]
-TEXT = [morning, afternoon, night]
-
+TEXT = map(shuffle, [morning, afternoon, night])
+replays = shuffle(shuffle(replays))
 
 class TwitBot(object):
     

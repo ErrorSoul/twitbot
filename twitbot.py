@@ -245,12 +245,12 @@ class TwitBot(object):
             print err
             sleep(360)
 
-########################################STEAL TWEET ################################
+######################################## STEAL TWEET ################################
 
     def steal_tweets(self, d):
         hour = d.hour
         print hour, "FGGGGGGGGGGGGGGGGJJGJGJGJGJJJJJJJJJJJJJJJJJ"
-        if hour == 5 or hour ==  15 :
+        if hour == 5 or hour ==  16 :
             print "TIME TO STEAL TWEETS"
             try:
                 #get my tweets
@@ -276,7 +276,7 @@ class TwitBot(object):
       
             
 
-########################################START########################################
+######################################## START ########################################
 
     def start(self):
         def complete(attr):
@@ -327,20 +327,29 @@ class TwitBot(object):
     def get_victims_timeline(self, text):
         def victims_tweets(name):
             try:
-                tweets =  self.twitter.get_user_timeline(screen_name=name, exclude_replies=1, count=200)[-1:-15:-1]
+                raw_tweets =  self.twitter.get_user_timeline(screen_name=name, exclude_replies=1, count=200)
                 print "dddd"
-                tweets = [c for c in tweets if (not c["entities"]['urls'] and
-                                              len(c['entities'])==4 and
-                                              not c['entities']['user_mentions']
-                                              )]
-                
-               
-                d = [c['text'] for c in tweets if c['text'] not in text][-1]
-                print d.encode('utf-8')
-                return d
+                def u(n):
+                    tweets = raw_tweets[-1:-n:-1]
+                    tweets = [c for c in tweets if (not c["entities"]['urls'] and
+                                                      len(c['entities'])==4 and
+                                                      not c['entities']['user_mentions']
+                                                      )]
+                    
+                    d = [c['text'] for c in tweets if c['text'] not in text]
+                    if d:
+                        d = d[-1]
+                        print d.encode('utf-8')
+                        return d
+                    else:
+                        return u(n+5)
+                return u(15)         
+            except IndexError:
+                 pass
             except TwythonError as err:
                 print err, "ddddddddd"
                 sleep(30)
+                
         return victims_tweets
        
         
@@ -369,7 +378,7 @@ class TwitBot(object):
             return dm 
         except TwythonError as er:
             print er
-##################################UNFOLLOW######################################
+################################## UNFOLLOW ######################################
 
     def unfollow_who_not_follow_back(self):
 
@@ -397,7 +406,7 @@ class TwitBot(object):
                 print er
                 sleep(60)          
                 
-###############################DATE STATUS############################################
+############################### DATE STATUS ############################################
 
     def date_status(self, text):
        

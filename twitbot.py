@@ -329,21 +329,21 @@ class TwitBot(object):
             try:
                 raw_tweets =  self.twitter.get_user_timeline(screen_name=name, exclude_replies=1, count=200)
                 print "dddd"
-                def u(n):
+                def recursive_tweet(n):
                     tweets = raw_tweets[-1:-n:-1]
                     tweets = [c for c in tweets if (not c["entities"]['urls'] and
                                                       len(c['entities'])==4 and
                                                       not c['entities']['user_mentions']
                                                       )]
                     
-                    d = [c['text'] for c in tweets if c['text'] not in text]
-                    if d:
-                        d = d[-1]
-                        print d.encode('utf-8')
-                        return d
+                    sample_tweet = [c['text'] for c in tweets if c['text'] not in text]
+                    if sample_tweet:
+                        sample_tweet = sample_tweet[-1]
+                        print sample_tweet.encode('utf-8')
+                        return sample_tweet
                     else:
-                        return u(n+5)
-                return u(15)         
+                        return recursive_tweet(n+5)
+                return recursive_tweet(15)         
             except IndexError:
                  pass
             except TwythonError as err:

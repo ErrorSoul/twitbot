@@ -254,7 +254,7 @@ class TwitBot(object):
             print "TIME TO STEAL TWEETS"
             try:
                 #get my tweets
-                my_tweets = self.twitter.get_user_timeline(count=140, exclude_replies=1)
+                my_tweets = self.twitter.get_user_timeline(count=200, exclude_replies=1)
                 my_tweets = [c["text"] for c in my_tweets]
 
                 #get victim's tweets

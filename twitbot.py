@@ -48,7 +48,7 @@ class TwitBot(object):
 
         #users victims
         self.users = (u"kulybyshev", u"captein_treniki",
-                      u"fe_city_boy", u"1badd", u"@drunktwi",
+                      u"fe_city_boy", u"1badd", u"drunktwi",
                       u"Doppler_Effectt", u"koffboy")
         
     
@@ -328,6 +328,7 @@ class TwitBot(object):
         def victims_tweets(name):
             try:
                 raw_tweets =  self.twitter.get_user_timeline(screen_name=name, exclude_replies=1, count=200)
+                raw_tweets = raw_tweets[:len(raw_tweets)- 10]
                 print "dddd"
                 def recursive_tweet(n):
                     tweets = raw_tweets[-1:-n:-1]

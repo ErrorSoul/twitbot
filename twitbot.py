@@ -47,8 +47,8 @@ class TwitBot(object):
         self.flag = True
 
         #users victims
-        self.users = (u"kulybyshev", u"captein_treniki",
-                      u"fe_city_boy", u"1badd", u"drunktwi",
+        self.users = (u"feeling_so_real", u"captein_treniki",
+                      u"fe_city_boy", u"drunktwi",
                       u"Doppler_Effectt", u"koffboy")
         
     
@@ -133,7 +133,7 @@ class TwitBot(object):
             sleep (280)
 
    
-################################HOME TIMELINE######################################
+################################ HOME TIMELINE ######################################
 
     def home_timeline(self):
         hour = datetime.now().hour
@@ -176,7 +176,7 @@ class TwitBot(object):
         else:
             print "NO TIMELINE UPDATES"
 
-################################################################################
+################################### TOOLS #############################################
 
     def retweet(self, id):
         try:
@@ -202,7 +202,7 @@ class TwitBot(object):
             print e
             sleep(120)
 
-###############################GET REPLAYS#############################################
+############################### GET REPLAYS #############################################
 
     def get_replays(self):
         dirty_list = [u"хуй", u"пидор",u"пидар", u"пидр",
@@ -251,7 +251,8 @@ class TwitBot(object):
     def steal_tweets(self, d):
         hour = d.hour
         print hour, "FGGGGGGGGGGGGGGGGJJGJGJGJGJJJJJJJJJJJJJJJJJ"
-        if hour == 5 or hour ==  16 :
+        #if hour == 5 or hour ==  16 :
+        if hour == 5:
             print "TIME TO STEAL TWEETS"
             try:
                 #get my tweets
@@ -329,6 +330,7 @@ class TwitBot(object):
         def victims_tweets(name):
             try:
                 raw_tweets =  self.twitter.get_user_timeline(screen_name=name, exclude_replies=1, count=200)
+                #cut tweets for dont updates people
                 raw_tweets = raw_tweets[:len(raw_tweets)- 10]
                 print "dddd"
                 def recursive_tweet(n):

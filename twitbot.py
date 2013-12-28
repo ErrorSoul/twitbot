@@ -160,7 +160,8 @@ class TwitBot(object):
                  if result:
                      tw = [tweet["id"] for tweet in result if (tweet['user']['screen_name'] != u"ghohol" and
                                                                 not tweet['entities']['user_mentions'])]
-                     self.t_id = tw[0]
+                     if self.tw:
+                        self.t_id = tw[0]
                      if randint(0,7) == 3:
                          print "Try retweet"
                          map(self.retweet, filter(lambda x:x % 7 == 0, tw))

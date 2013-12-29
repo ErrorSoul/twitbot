@@ -160,7 +160,7 @@ class TwitBot(object):
                  if result:
                      tw = [tweet["id"] for tweet in result if (tweet['user']['screen_name'] != u"ghohol" and
                                                                 not tweet['entities']['user_mentions'])]
-                     if self.tw:
+                     if tw:
                         self.t_id = tw[0]
                      if randint(0,7) == 3:
                          print "Try retweet"
@@ -494,6 +494,6 @@ if __name__ == "__main__":
         y = twitter.get_replays()
         for c in y:
             print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
-            print c[2].encode('utf-8'), '\n'
-
+            print c[2].encode('utf-8'), '\n' 
+    
 

@@ -404,7 +404,6 @@ class TwitBot(object):
                 #unfollowing list
                 destroy_list = (user_id for user_id in friends_ids 
                                 if user_id not in followers_ids)
-                for c in destroy_list: print c
                 map(lambda x : self.twitter.destroy_friendship(user_id=x), destroy_list)
                 print "UNFOLLOWING END"
             except TwythonError as er:
@@ -437,8 +436,8 @@ class TwitBot(object):
         ##     except TwythonError as err:
         ##         print err
         ##         sleep(480)
-        ## else:
-        ##     sleep(randint (1200, 1800))
+        else:
+            sleep(randint (1200, 1800))
 
 ################################################################################
 class T_date(Thread):

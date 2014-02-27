@@ -14,9 +14,9 @@ OAUTH_TOKEN        = "1964645443-mmEaq9TWNGoXoZ9glFrE96Yx9ktHHkCRUxCFfms"
 OAUTH_TOKEN_SECRET = "2PbSnYpJdGJdv1TF1F3eCF5SRdigCcwVYRpvsrfELta0t"
 QUERYS = [u"хахол", u"хохол"]
 TEXT = [morning, afternoon, night]
-map(shuffle,TEXT)
-for c in range(3):
-    shuffle(replays)
+## map(shuffle,TEXT)
+## for c in range(3):
+##     shuffle(replays)
 
 class TwitBot(object):
     
@@ -206,7 +206,7 @@ class TwitBot(object):
 ############################### GET REPLAYS #############################################
 
     def get_replays(self):
-        dirty_list = [u"хуй", u"пидор",u"пидар", u"пидр",
+        dirty_list = (u"хуй", u"пидор",u"пидар", u"пидр",
                       u"бля", u"блядь", u"сука",u"ебень",
                       u"гондон", u"гандон", u"шлюха",
                       u"чмо", u"залупа", u"eблан",
@@ -216,7 +216,7 @@ class TwitBot(object):
                       u"дебил", u"дибил", u"петух",
                       u"питух", u"петушок", u"ебали",
                       u"хуя"
-                      ]
+                      )
         
         
 
@@ -366,7 +366,7 @@ class TwitBot(object):
             print "START CLEAR TWEETS"
             try:
                 tweets = self.twitter.get_user_timeline(count= 100)
-                tweets = [c["id"] for c in tweets if c["in_reply_to_user_id"] ]
+                tweets = (c["id"] for c in tweets if c["in_reply_to_user_id"] )
                 sleep(15)
                 map(self.delete_status, tweets)
             except TwythonError as err:
@@ -387,7 +387,7 @@ class TwitBot(object):
     def unfollow_who_not_follow_back(self):
 
         data = datetime.now()
-        #clean followers every odd day 
+        #clean followers every odd day
         if data.day % 2 == 0 and data.hour == 1:
             print "UNFOLLOWING START"
             # "stars" id
@@ -398,12 +398,13 @@ class TwitBot(object):
             try:
                 #get friends ids
                 friends_ids = self.twitter.get_friends_ids()[u"ids"]
-                friends_ids = [id for id in friends_ids if id not in stars_id]
+                friends_ids = (id for id in friends_ids if id not in stars_id)
                 #get followers ids
                 followers_ids = self.twitter.get_followers_ids()[u"ids"]
                 #unfollowing list
-                destroy_list = [user_id for user_id in friends_ids 
-                                if user_id not in followers_ids] 
+                destroy_list = (user_id for user_id in friends_ids 
+                                if user_id not in followers_ids)
+                for c in destroy_list: print c
                 map(lambda x : self.twitter.destroy_friendship(user_id=x), destroy_list)
                 print "UNFOLLOWING END"
             except TwythonError as er:
@@ -421,23 +422,23 @@ class TwitBot(object):
         if current_time.hour == 9 or current_time.hour == 16 :
             self.flag = True
         
-        def part_of_day(time_of_day):
-            """return True if current time equal time_of_day"""
-            return (current_time.hour == time_of_day[0] and
-                    current_time.minute in range(time_of_day[1]))
+        ## def part_of_day(time_of_day):
+        ##     """return True if current time equal time_of_day"""
+        ##     return (current_time.hour == time_of_day[0] and
+        ##             current_time.minute in range(time_of_day[1]))
 
-        check_time = filter(part_of_day, self.time)
-        if check_time:
-            print "check_time"
-            message = choice(text[self.time.index(check_time[0])])
-            try:
-                self.twitter.update_status(status= u"{0}".format(message))
-                sleep(randint(1600, 2400))
-            except TwythonError as err:
-                print err
-                sleep(480)
-        else:
-            sleep(randint (1200, 1800))
+        ## check_time = filter(part_of_day, self.time)
+        ## if check_time:
+        ##     print "check_time"
+        ##     message = choice(text[self.time.index(check_time[0])])
+        ##     try:
+        ##         self.twitter.update_status(status= u"{0}".format(message))
+        ##         sleep(randint(1600, 2400))
+        ##     except TwythonError as err:
+        ##         print err
+        ##         sleep(480)
+        ## else:
+        ##     sleep(randint (1200, 1800))
 
 ################################################################################
 class T_date(Thread):

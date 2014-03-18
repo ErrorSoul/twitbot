@@ -200,6 +200,10 @@ class TwitBot(object):
     @wrapper
     def delete_status(self, id):
        self.twitter.destroy_status(id=id)
+
+    @wrapper
+    def destroy_friendship(self, id):
+        self.twitter.destroy_friendship(id=id)
        
 
 ############################### GET REPLAYS #############################################
@@ -403,7 +407,7 @@ class TwitBot(object):
                 #unfollowing list
                 destroy_list = (user_id for user_id in friends_ids 
                                 if user_id not in followers_ids)
-                map(lambda x : self.twitter.destroy_friendship(user_id=x), destroy_list)
+                map(self.twitter.destroy_friendship, destroy_list)
                 print "UNFOLLOWING END"
             except TwythonError as er:
                 print er

@@ -179,29 +179,28 @@ class TwitBot(object):
 
 ################################### TOOLS #############################################
 
+    def wrapper(func):
+        def shell(*args):
+            try:
+                func(*args)
+                sleep(randint(120, 240))
+            except TwythonError as e:
+                print e
+                sleep(180)
+        return shell
+    
+    @wrapper 
     def retweet(self, id):
-        try:
-            self.twitter.retweet(id=id)
-            sleep(randint(60,180))
-        except TwythonError as e:
-            print e
-            sleep(120)
-
+        self.twitter.retweet(id=id)
+            
+    @wrapper
     def favorite(self, id):
-        try:
-            self.twitter.create_favorite(id=id)
-            sleep(randint(45,100))
-        except TwythonError as err:
-            print err
-            sleep(180)
+       self.twitter.create_favorite(id=id)
 
+    @wrapper
     def delete_status(self, id):
-        try:
-            self.twitter.destroy_status(id=id)
-            sleep(randint(200,480))
-        except TwythonError as e:
-            print e
-            sleep(120)
+       self.twitter.destroy_status(id=id)
+       
 
 ############################### GET REPLAYS #############################################
 
@@ -252,7 +251,7 @@ class TwitBot(object):
     def steal_tweets(self, d):
         hour = d.hour
         print hour, "FGGGGGGGGGGGGGGGGJJGJGJGJGJJJJJJJJJJJJJJJJJ"
-        if hour == 5 or hour ==  16 :
+        if hour in (5, 16):
             print "TIME TO STEAL TWEETS"
             try:
                 #get my tweets
@@ -418,7 +417,7 @@ class TwitBot(object):
         current_time = datetime.now()
         print "current time = {0}".format(str(current_time))
         #this part for count_replies
-        if current_time.hour == 9 or current_time.hour == 16 :
+        if current_time.hour in (9, 16):
             self.flag = True
         
         ## def part_of_day(time_of_day):
@@ -472,28 +471,31 @@ class D(Thread):
 if __name__ == "__main__":
     twitter = TwitBot(CONSUMER_KEY,CONSUMER_SECRET,
                       OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
-    #start twiter
-    twitter.start()
+
+
+    twitter.delete_status("445662008466493440")
+    ## #start twiter
+    ## twitter.start()
    
-    #init thread
-    d = D(twitter)
-    d.daemon = True
-    d.start()
-    #init thread
-    t = T_date(twitter)
-    t.daemon = True
-    t.start()
-    while True:
-        twitter.unfollow_who_not_follow_back()
-        twitter.delete_replies()
-        twitter.home_timeline()
-        for query in QUERYS:
-            twitter.run_search(query, replays)
-            sleep(70)
-        sleep(randint(60,120))
-        y = twitter.get_replays()
-        for c in y:
-            print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
-            print c[2].encode('utf-8'), '\n' 
+    ## #init thread
+    ## d = D(twitter)
+    ## d.daemon = True
+    ## d.start()
+    ## #init thread
+    ## t = T_date(twitter)
+    ## t.daemon = True
+    ## t.start()
+    ## while True:
+    ##     twitter.unfollow_who_not_follow_back()
+    ##     twitter.delete_replies()
+    ##     twitter.home_timeline()
+    ##     for query in QUERYS:
+    ##         twitter.run_search(query, replays)
+    ##         sleep(70)
+    ##     sleep(randint(60,120))
+    ##     y = twitter.get_replays()
+    ##     for c in y:
+    ##         print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
+    ##         print c[2].encode('utf-8'), '\n' 
     
 

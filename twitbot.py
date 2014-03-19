@@ -120,15 +120,11 @@ class TwitBot(object):
                     u"Сколько мата тьфу ты, бля"
                   ] 
               
-        try:
-            self.twitter.update_status(status= u"@{0} {1}".format(
-                                       name, choice(answers)),
-                                      in_reply_to_status_id=id)
-            sleep(randint(140,280))
-            
-        except TwythonError as err:
-            print err
-            sleep (280)
+
+        self.twitter.update_status(status= u"@{0} {1}".format(
+                                   name, choice(answers)),
+                                   in_reply_to_status_id=id)
+        sleep(randint(140,280))
 
    
 ################################ HOME TIMELINE ######################################
@@ -188,7 +184,7 @@ class TwitBot(object):
        
 
 ################################### Tools #############################################
-    for name in ("retweet", "create_favorite", "self.destroy_status",
+    for name in ("retweet", "create_favorite", "destroy_status",
                  "destroy_friendship"):
         exec("""def {0}(self, id):
                     self.twitter.{0}(id=id)""".format(name))

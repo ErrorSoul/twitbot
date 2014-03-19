@@ -7,6 +7,7 @@ from datetime import datetime
 from threading import Thread
 from time import  sleep
 from text import replays, night, afternoon, morning
+#from decorators import wrapper
 
 CONSUMER_KEY       = "Dc8GNbgcOklJie3TV2V0A"
 CONSUMER_SECRET    = "QducleApTwunlqZmNM0AdhwlhWpoDJ44agk6UnPs"
@@ -18,6 +19,16 @@ TEXT = [morning, afternoon, night]
 ## for c in range(3):
 ##     shuffle(replays)
 
+
+def wrapper(func):
+    def shell(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+            sleep(randint(120, 240))
+        except TwythonError as e:
+            print e
+            sleep(180)
+    return shell
 class TwitBot(object):
     
 
@@ -137,58 +148,58 @@ class TwitBot(object):
 
     def home_timeline(self):
         hour = datetime.now().hour
+        #update_replies_count(hour)
+        #debug
+        print self.replies_count, "count"
+        print self.replies_limit, "limit"
+        #end debug
+        
 
         def update_replies_count(hour):
             if self.flag:
-                if hour == 10 or hour == 17:
+                if hour in (10,17):
                     self.replies_limit = randint(3,12)
                     self.flag = False
                     self.replies_count = 0
                 
-        update_replies_count(hour)
-        print self.replies_count, "count"
-        print self.replies_limit, "limit"
-                
-        if (hour in range(0,3) or hour in range(9,24)
-            and hour % 4 == 0):
-            
-                
-            print "CHECK TIMELINE UPDATES"
-            try:
-                 result = self.twitter.get_home_timeline(count= 30,exclude_replies = 1,
-                                                         since_id = self.t_id)
-                 if result:
-                     tw = [tweet["id"] for tweet in result if (tweet['user']['screen_name'] != u"ghohol" and
-                                                                not tweet['entities']['user_mentions'])]
-                     if tw:
-                        self.t_id = tw[0]
-                     if randint(0,7) == 3:
-                         print "Try retweet"
-                         map(self.retweet, filter(lambda x:x % 7 == 0, tw))
+        
+        
+        def timeline_updates(func):
+            """check time and run if time rt and fav in homeline"""
+            def new(*args, **kwargs):       
+                if (hour in range(0,4) or hour in range(9,24)):
+                    print "CHECK TIMELINE UPDATES"
+                    func(*args, **kwargs)
+                else:
+                    print "NO TIMELINE UPDATES"
+            return new
 
-                     if randint(0,7) == 3:
-                         print "Try favourite"
-                         map(self.favorite, filter(lambda x: x%5 == 0, tw))
-                     
-                     sleep(300)
-            except TwythonError as err:
-                print err
-                sleep(300)
-        else:
-            print "NO TIMELINE UPDATES"
+        @timeline_updates
+        @wrapper
+        def try_rt_or_fav():
+            result = self.get_home_timeline(count=30,exclude_replies=1,
+                                            since_id=self.t_id)
+            if result:
+                tw = [tweet["id"] for tweet in result if (tweet['user']['screen_name'] != u"ghohol" and
+                                                        not tweet['entities']['user_mentions']
+                                                      )]
+                if tw:
+                    self.t_id = tw[0]
+                    rt_or_fav = lambda func : map(func, filter(lambda x:x % 127 == 0, tw))
+                    if (randint(0,7) == randint(0,7)):                           
+                        map(rt_or_fav,(self.retweet, self.favorite)) 
+
+        try_rt_or_fav()
+                            
+
+                            
+
+                    
+         
+       
 
 ################################### TOOLS #############################################
 
-    def wrapper(func):
-        def shell(*args):
-            try:
-                func(*args)
-                sleep(randint(120, 240))
-            except TwythonError as e:
-                print e
-                sleep(180)
-        return shell
-    
     @wrapper 
     def retweet(self, id):
         self.twitter.retweet(id=id)
@@ -204,6 +215,10 @@ class TwitBot(object):
     @wrapper
     def destroy_friendship(self, id):
         self.twitter.destroy_friendship(id=id)
+
+    @wrapper
+    def get_home_timeline(self, *args, **kwargs):
+        self.twitter.get_home_timeline(*args, **kwargs)
        
 
 ############################### GET REPLAYS #############################################
@@ -477,9 +492,9 @@ if __name__ == "__main__":
                       OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
 
 
-    twitter.delete_status("445662008466493440")
+    #twitter.delete_status("445662008466493440")
     ## #start twiter
-    ## twitter.start()
+    twitter.start()
    
     ## #init thread
     ## d = D(twitter)

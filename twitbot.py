@@ -5,7 +5,7 @@ from twython import Twython, TwythonError
 from random import choice, randint, shuffle  
 from datetime import datetime
 from threading import Thread
-from time import  sleep
+from time import  time, sleep
 from text import replays, night, afternoon, morning
 from decorators import wrapper
 
@@ -110,74 +110,50 @@ class TwitBot(object):
                 sleep(400)
 
 ################################################################################
-    @wrapper
-    def update_dirty_status(self, name, id):
-        answers = [ u"Ты еще и ругаешься",
-                    u"Попросил бы без оскорблений",
-                    u"Очень грубо",
-                    u"А можно без мата?",
-                    u"Кто так обзывается, сам так называется",
-                    u"Сколько мата тьфу ты, бля"
-                  ] 
-              
-
-        self.update_status(status= u"@{0} {1}".format(
-                                   name, choice(answers)),
-                                   in_reply_to_status_id=id)
-        sleep(randint(140,280))
+    
 
    
 ################################ HOME TIMELINE ######################################
-
+    @wrapper()
     def home_timeline(self):
+        """ update count of replies
+            update timeline(random rt or fav in homeline)
+        """
         hour = self.data.hour
-        #update_replies_count(hour)
+        
         #debug
         print self.replies_count, "count"
         print self.replies_limit, "limit"
         #end debug
-        
-        
 
-        def update_replies_count(hour):
+        def update_replies_count():
+            """update flags and replies limit"""
             if self.flag:
                 if hour in (10,17):
                     self.replies_limit = randint(3,12)
                     self.flag = False
                     self.replies_count = 0
-                
-        
-        
-        def timeline_updates(func):
+
+        def timeline_updates():
             """check time and run if time rt and fav in homeline"""
-            def new(*args, **kwargs):       
-                if (hour in range(0, 3) or hour in range(9, 24)):
-                    print "CHECK TIMELINE UPDATES"
-                    func(*args, **kwargs)
-                else:
-                    print "NO TIMELINE UPDATES"
-            return new
-
-        @timeline_updates
-        @wrapper
-        def try_rt_or_fav():
-            result = self.get_home_timeline(count=30,exclude_replies=1,
+            if (hour in range(0, 3) or hour in range(9, 24)):
+                print "CHECK TIMELINE UPDATES"
+                result = self.get_home_timeline(count=30,exclude_replies=1,
                                             since_id=self.t_id)
-            if result:
-                tw = [tweet["id"] for tweet in result if (tweet['user']['screen_name'] != u"ghohol" and
-                                                        not tweet['entities']['user_mentions']
-                                                      )]
-                if tw:
-                    self.t_id = tw[0]
-                    rt_or_fav = lambda func : map(func, filter(lambda x:x % 127 == 0, tw))
-                    if (randint(0,7) == randint(0,7)):                           
-                        map(rt_or_fav,(self.retweet, self.create_favorite)) 
-
-        try_rt_or_fav()
+                if result:
+                    tw = [tweet["id"] for tweet in result if (tweet['user']['screen_name'] != u"ghohol" and
+                                                            not tweet['entities']['user_mentions'])]
+                    if tw:
+                        self.t_id = tw[0]
+                        rt_or_fav = lambda func : map(func, filter(lambda x:x % 127 == 0, tw))
+                        if (randint(0,7) == randint(0,7)):                           
+                            map(rt_or_fav,(self.retweet, self.create_favorite))
+            else:
+                print "NO TIMELINE UPDATES" 
+                            
         
-                            
-
-                            
+        #update_replies_count()
+        timeline_updates()                
 
                     
          
@@ -200,7 +176,7 @@ class TwitBot(object):
     def data(self):
         return datetime.now()
 
-    @wrapper(n=0)  
+      
     def my_reetwets(self):
         """return id of my retweets"""
         retweets =  self.twitter.retweeted_of_me()
@@ -213,7 +189,7 @@ class TwitBot(object):
        
 
 ############################### GET REPLAYS #############################################
-
+    @wrapper()
     def get_replays(self):
         dirty_list = (u"хуй", u"пидор",u"пидар", u"пидр",
                       u"бля", u"блядь", u"сука",u"ебень",
@@ -236,28 +212,40 @@ class TwitBot(object):
                     return word
             return False
         
-        try:
-            repl = self.twitter.get_mentions_timeline(include_rts = 0,
-                                                      since_id = self.m_id)
+    
+        repl = self.twitter.get_mentions_timeline(include_rts = 0,
+                                                  since_id = self.m_id)
 
+        if repl:
+            repl =[(c["id"],c["user"]["screen_name"],c["text"]) for c
+                   in repl if u"RT" not in c["text"]]
+            self.m_id = repl[0][0]
+            repl = filter(is_shit, repl)
             if repl:
-                repl =[(c["id"],c["user"]["screen_name"],c["text"]) for c
-                       in repl if u"RT" not in c["text"]]
-                self.m_id = repl[0][0]
-                repl = filter(is_shit, repl)
-                if repl:
-                    print "Try send mention for dirty reply"
-                    for tw in repl:
-                       (self.retweet(tw[0]) if randint(0,1)
-                        else self.update_dirty_status(tw[1],tw[0]))
-                return repl
-            return repl 
-        except TwythonError as err:
-            print err
-            sleep(360)
+                print "Try send mention for dirty reply"
+                for tw in repl:
+                   (self.retweet(tw[0]) if randint(0,1)
+                    else self.update_dirty_status(tw[1],tw[0]))
+            return repl
+        return repl 
+        
+            
+    def update_dirty_status(self, name, id):
+        answers = [ u"Ты еще и ругаешься",
+                    u"Попросил бы без оскорблений",
+                    u"Очень грубо",
+                    u"А можно без мата?",
+                    u"Кто так обзывается, сам так называется",
+                    u"Сколько мата тьфу ты, бля"
+                  ] 
+              
 
+        self.update_status(status= u"@{0} {1}".format(
+                                   name, choice(answers)),
+                                   in_reply_to_status_id=id)
+        sleep(randint(140,280))
 ######################################## STEAL TWEET ################################
-    @wrapper
+    @wrapper()
     def steal_tweets(self, d):
         hour = d.hour
         print hour, "FGGGGGGGGGGGGGGGGJJGJGJGJGJJJJJJJJJJJJJJJJJ"
@@ -270,8 +258,10 @@ class TwitBot(object):
             get_victims_timeline = self.get_victims_timeline(my_tweets)
             victims_tweets = map(get_victims_timeline, self.users)
             for tweet in victims_tweets:
-                self.twitter.update_status(status=tweet)
-                sleep(3600)
+                print tweet
+                if tweet is not None:
+                    self.twitter.update_status(status=tweet)
+                    sleep(3600)
             print "STEALING TWEETS IS OVER"
         else:
             sleep(3600)
@@ -282,6 +272,7 @@ class TwitBot(object):
         def victims_tweets(name):
             raw_tweets =  self.twitter.get_user_timeline(screen_name=name, exclude_replies=1, count=60)
             print "dddd"
+            print "raw_tweets", len(raw_tweets)
             tweets = raw_tweets[-1:len(raw_tweets):-1]
             tweets = [c for c in tweets if (not c["entities"]['urls'] and
                                                   len(c['entities'])==4 and
@@ -299,7 +290,7 @@ class TwitBot(object):
             
 
 ######################################## START ########################################
-
+    @wrapper(n=0)
     def start(self):
         def complete(attr):
             d = {"self.jd":self.jd, "self.id":self.id,
@@ -329,14 +320,10 @@ class TwitBot(object):
                 self.m_id =  self.twitter.get_mentions_timeline(count=30, include_rts = 0)[0]["id"]
                 if self.m_id:
                     complete("self.m_id")
-                
-            except TwythonError as err:
-                print err
-                sleep(480)
 
 ###################################### DELETE REPLIES  ##############################################                    
 
-    @wrapper
+    @wrapper()
     def delete_replies(self):
         if self.data.hour == 23:
             print "START CLEAR TWEETS"
@@ -350,7 +337,7 @@ class TwitBot(object):
 
  
 ################################## UNFOLLOW ######################################
-    @wrapper
+    @wrapper()
     def unfollow_who_not_follow_back(self):
         data = self.data
         #clean followers every odd day
@@ -438,28 +425,28 @@ if __name__ == "__main__":
 
 
     #twitter.delete_status("445662008466493440")
-    ## #start twiter
+    #start twiter
     twitter.start()
    
-    ## #init thread
-    ## d = D(twitter)
-    ## d.daemon = True
-    ## d.start()
-    ## #init thread
-    ## t = T_date(twitter)
-    ## t.daemon = True
-    ## t.start()
-    ## while True:
-    ##     twitter.unfollow_who_not_follow_back()
-    ##     twitter.delete_replies()
-    ##     twitter.home_timeline()
-    ##     for query in QUERYS:
-    ##         twitter.run_search(query, replays)
-    ##         sleep(70)
-    ##     sleep(randint(60,120))
-    ##     y = twitter.get_replays()
-    ##     for c in y:
-    ##         print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
-    ##         print c[2].encode('utf-8'), '\n' 
+    #init thread
+    d = D(twitter)
+    d.daemon = True
+    d.start()
+    #init thread
+    t = T_date(twitter)
+    t.daemon = True
+    t.start()
+    while True:
+        twitter.unfollow_who_not_follow_back()
+        twitter.delete_replies()
+        twitter.home_timeline()
+        for query in QUERYS:
+            twitter.run_search(query, replays)
+            sleep(70)
+        sleep(randint(60,120))
+        y = twitter.get_replays()
+        for c in y:
+            print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
+            print c[2].encode('utf-8'), '\n' 
     
 

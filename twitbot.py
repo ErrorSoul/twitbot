@@ -143,7 +143,7 @@ class TwitBot(object):
         print self.replies_count, "count"
         print self.replies_limit, "limit"
         #end debug
-        try_rt_or_fav()
+        
         
 
         def update_replies_count(hour):
@@ -158,7 +158,7 @@ class TwitBot(object):
         def timeline_updates(func):
             """check time and run if time rt and fav in homeline"""
             def new(*args, **kwargs):       
-                if (hour in range(0,3) or hour in range(9,24)):
+                if (hour in range(0, 3) or hour in range(9, 24)):
                     print "CHECK TIMELINE UPDATES"
                     func(*args, **kwargs)
                 else:
@@ -180,7 +180,7 @@ class TwitBot(object):
                     if (randint(0,7) == randint(0,7)):                           
                         map(rt_or_fav,(self.retweet, self.favorite)) 
 
-        main()
+        try_rt_or_fav()
         
                             
 
@@ -213,7 +213,7 @@ class TwitBot(object):
         self.twitter.get_home_timeline(*args, **kwargs)
     @property
     def data(self):
-        return self.data
+        return datetime.now()
        
 
 ############################### GET REPLAYS #############################################

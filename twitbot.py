@@ -7,7 +7,7 @@ from datetime import datetime
 from threading import Thread
 from time import  sleep
 from text import replays, night, afternoon, morning
-#from decorators import wrapper
+from decorators import wrapper
 
 CONSUMER_KEY       = "Dc8GNbgcOklJie3TV2V0A"
 CONSUMER_SECRET    = "QducleApTwunlqZmNM0AdhwlhWpoDJ44agk6UnPs"
@@ -19,16 +19,6 @@ TEXT = [morning, afternoon, night]
 ## for c in range(3):
 ##     shuffle(replays)
 
-
-def wrapper(func):
-    def shell(*args, **kwargs):
-        try:
-            func(*args, **kwargs)
-            sleep(randint(120, 240))
-        except TwythonError as e:
-            print e
-            sleep(180)
-    return shell
 class TwitBot(object):
     
 
@@ -147,12 +137,13 @@ class TwitBot(object):
 ################################ HOME TIMELINE ######################################
 
     def home_timeline(self):
-        hour = datetime.now().hour
+        hour = self.data.hour
         #update_replies_count(hour)
         #debug
         print self.replies_count, "count"
         print self.replies_limit, "limit"
         #end debug
+        try_rt_or_fav()
         
 
         def update_replies_count(hour):
@@ -167,7 +158,7 @@ class TwitBot(object):
         def timeline_updates(func):
             """check time and run if time rt and fav in homeline"""
             def new(*args, **kwargs):       
-                if (hour in range(0,4) or hour in range(9,24)):
+                if (hour in range(0,3) or hour in range(9,24)):
                     print "CHECK TIMELINE UPDATES"
                     func(*args, **kwargs)
                 else:
@@ -189,7 +180,8 @@ class TwitBot(object):
                     if (randint(0,7) == randint(0,7)):                           
                         map(rt_or_fav,(self.retweet, self.favorite)) 
 
-        try_rt_or_fav()
+        main()
+        
                             
 
                             
@@ -219,6 +211,9 @@ class TwitBot(object):
     @wrapper
     def get_home_timeline(self, *args, **kwargs):
         self.twitter.get_home_timeline(*args, **kwargs)
+    @property
+    def data(self):
+        return self.data
        
 
 ############################### GET REPLAYS #############################################
@@ -379,7 +374,7 @@ class TwitBot(object):
         
 
     def delete_replies(self):
-        a = datetime.now().hour
+        a = self.data.hour
         if a == 23:
             print "START CLEAR TWEETS"
             try:
@@ -404,7 +399,7 @@ class TwitBot(object):
 
     def unfollow_who_not_follow_back(self):
 
-        data = datetime.now()
+        data = self.data
         #clean followers every odd day
         if data.day % 2 == 0 and data.hour == 1:
             print "UNFOLLOWING START"
@@ -433,7 +428,7 @@ class TwitBot(object):
     def date_status(self, text):
        
         
-        current_time = datetime.now()
+        current_time = self.data
         print "current time = {0}".format(str(current_time))
         #this part for count_replies
         if current_time.hour in (9, 16):
@@ -476,8 +471,7 @@ class D(Thread):
         
 
     def p(self):
-        a = datetime.now()
-        
+        a = self.data
         print "CURRENT TIME ==> {0}".format(a)
         self.twitter.steal_tweets(a)
         

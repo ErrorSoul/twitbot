@@ -300,26 +300,25 @@ class TwitBot(object):
 
         while ((not self.m_id or not self.t_id) or
                (self.id[0] == 0 or self.jd[0] == 0)):
-            try:
-                for query in QUERYS:
-                    result = self.twitter.search(q=query)
-                    if query == u"хахол":
-                        self.jd[0] = self.get_users(result,debug=1)[-1][0]
-                        if self.jd[0]:
-                            complete("self.jd")
-                           
-                    else:
-                        self.id[0] = self.get_users(result,debug=1)[-1][0]
-                        if self.id[0]:
-                            complete("self.id")
-                            
-                self.t_id = self.twitter.get_home_timeline(exclude_replies = 1)[0]["id"]
-                if self.t_id:
-                    complete("self.t_id")
+            for query in QUERYS:
+                result = self.twitter.search(q=query)
+                if query == u"хахол":
+                    self.jd[0] = self.get_users(result,debug=1)[-1][0]
+                    if self.jd[0]:
+                        complete("self.jd")
 
-                self.m_id =  self.twitter.get_mentions_timeline(count=30, include_rts = 0)[0]["id"]
-                if self.m_id:
-                    complete("self.m_id")
+                else:
+                    self.id[0] = self.get_users(result,debug=1)[-1][0]
+                    if self.id[0]:
+                        complete("self.id")
+
+            self.t_id = self.twitter.get_home_timeline(exclude_replies = 1)[0]["id"]
+            if self.t_id:
+                complete("self.t_id")
+
+            self.m_id =  self.twitter.get_mentions_timeline(count=30, include_rts = 0)[0]["id"]
+            if self.m_id:
+                complete("self.m_id")
 
 ###################################### DELETE REPLIES  ##############################################                    
 
@@ -409,7 +408,7 @@ class D(Thread):
         
 
     def p(self):
-        a = self.data
+        a = datetime.now()
         print "CURRENT TIME ==> {0}".format(a)
         self.twitter.steal_tweets(a)
         

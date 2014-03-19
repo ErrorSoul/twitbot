@@ -200,7 +200,7 @@ class TwitBot(object):
     def data(self):
         return datetime.now()
 
-    @wrapper   
+    @wrapper(n=0)  
     def my_reetwets(self):
         """return id of my retweets"""
         retweets =  self.twitter.retweeted_of_me()
@@ -257,34 +257,45 @@ class TwitBot(object):
             sleep(360)
 
 ######################################## STEAL TWEET ################################
-
+    @wrapper
     def steal_tweets(self, d):
         hour = d.hour
         print hour, "FGGGGGGGGGGGGGGGGJJGJGJGJGJJJJJJJJJJJJJJJJJ"
         if hour in (5, 16):
             print "TIME TO STEAL TWEETS"
-            try:
-                #get my tweets
-                my_tweets = self.twitter.get_user_timeline(count=200, exclude_replies=1)
-                my_tweets = [c["text"] for c in my_tweets]
-
-                #get victim's tweets
-                get_victims_timeline = self.get_victims_timeline(my_tweets)
-                victims_tweets = map(get_victims_timeline, self.users)
-                for tweet in victims_tweets:
-                    self.twitter.update_status(status=tweet)
-                    sleep(3600)
-                print "STEALING TWEETS IS OVER"
-
-            except TwythonError as err:
-                print err
-                sleep(180)
+            #get my tweets
+            my_tweets = self.twitter.get_user_timeline(count=200, exclude_replies=1)
+            my_tweets = [c["text"] for c in my_tweets]
+            #get victim's tweets
+            get_victims_timeline = self.get_victims_timeline(my_tweets)
+            victims_tweets = map(get_victims_timeline, self.users)
+            for tweet in victims_tweets:
+                self.twitter.update_status(status=tweet)
+                sleep(3600)
+            print "STEALING TWEETS IS OVER"
         else:
             sleep(3600)
        
         
         
-      
+    def get_victims_timeline(self, text):
+        def victims_tweets(name):
+            raw_tweets =  self.twitter.get_user_timeline(screen_name=name, exclude_replies=1, count=60)
+            print "dddd"
+            tweets = raw_tweets[-1:len(raw_tweets):-1]
+            tweets = [c for c in tweets if (not c["entities"]['urls'] and
+                                                  len(c['entities'])==4 and
+                                                  not c['entities']['user_mentions']
+                                                  )]
+
+            sample_tweet = [c['text'] for c in tweets if c['text'] not in text]
+            if sample_tweet:
+                sample_tweet = sample_tweet[-1]
+                print sample_tweet.encode('utf-8')
+                return sample_tweet
+            else:
+                return None
+        return victims_tweets
             
 
 ######################################## START ########################################
@@ -323,42 +334,8 @@ class TwitBot(object):
                 print err
                 sleep(480)
 
-####################################################################################                    
+###################################### DELETE REPLIES  ##############################################                    
 
-
-    def get_victims_timeline(self, text):
-        def victims_tweets(name):
-            try:
-                raw_tweets =  self.twitter.get_user_timeline(screen_name=name, exclude_replies=1, count=200)
-                #cut tweets for dont updates people
-                raw_tweets = raw_tweets[:len(raw_tweets)- 10]
-                print "dddd"
-                def recursive_tweet(n):
-                    tweets = raw_tweets[-1:-n:-1]
-                    tweets = [c for c in tweets if (not c["entities"]['urls'] and
-                                                      len(c['entities'])==4 and
-                                                      not c['entities']['user_mentions']
-                                                      )]
-                    
-                    sample_tweet = [c['text'] for c in tweets if c['text'] not in text]
-                    if sample_tweet:
-                        sample_tweet = sample_tweet[-1]
-                        print sample_tweet.encode('utf-8')
-                        return sample_tweet
-                    else:
-                        return recursive_tweet(n+5)
-                return recursive_tweet(15)         
-            except IndexError:
-                 pass
-            except TwythonError as err:
-                print err, "ddddddddd"
-                sleep(30)
-                
-        return victims_tweets
-       
-        
-        
-        
     @wrapper
     def delete_replies(self):
         if self.data.hour == 23:

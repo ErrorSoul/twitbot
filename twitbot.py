@@ -111,9 +111,6 @@ class TwitBot(object):
 
 ################################################################################
 
-    def show_status(self, *args, **kwargs):
-        return self.twitter.show_status(*args, **kwargs)
-
     def update_dirty_status(self, name, id):
         answers = [ u"Ты еще и ругаешься",
                     u"Попросил бы без оскорблений",
@@ -178,7 +175,7 @@ class TwitBot(object):
                     self.t_id = tw[0]
                     rt_or_fav = lambda func : map(func, filter(lambda x:x % 127 == 0, tw))
                     if (randint(0,7) == randint(0,7)):                           
-                        map(rt_or_fav,(self.retweet, self.favorite)) 
+                        map(rt_or_fav,(self.retweet, self.create_favorite)) 
 
         try_rt_or_fav()
         
@@ -190,30 +187,32 @@ class TwitBot(object):
          
        
 
-################################### TOOLS #############################################
+################################### Tools #############################################
+    for name in ("retweet", "create_favorite", "self.destroy_status",
+                 "destroy_friendship"):
+        exec("""def {0}(self, id):
+                    self.twitter.{0}(id=id)""".format(name))
 
-    @wrapper 
-    def retweet(self, id):
-        self.twitter.retweet(id=id)
-            
-    @wrapper
-    def favorite(self, id):
-       self.twitter.create_favorite(id=id)
+    for name in ("get_home_timeline", "get_direct_messages", "get_friends_ids",
+                 "get_followers_ids", "get_user_timeline", "show_status"):
 
-    @wrapper
-    def delete_status(self, id):
-       self.twitter.destroy_status(id=id)
-
-    @wrapper
-    def destroy_friendship(self, id):
-        self.twitter.destroy_friendship(id=id)
-
-    @wrapper
-    def get_home_timeline(self, *args, **kwargs):
-        self.twitter.get_home_timeline(*args, **kwargs)
+        exec("""def {0}(self, *args, **kwargs):
+                    return self.twitter.{0}(*args, **kwargs)""".format(name))
+    
     @property
     def data(self):
         return datetime.now()
+
+    @wrapper   
+    def my_reetwets(self):
+        """return id of my retweets"""
+        retweets =  self.twitter.retweeted_of_me()
+        retweets_id = [c["id"] for c in retweets]
+        return retweets_id
+
+    
+             
+       
        
 
 ############################### GET REPLAYS #############################################
@@ -328,16 +327,7 @@ class TwitBot(object):
                 sleep(480)
 
 ####################################################################################                    
-        
-    def my_reetwets(self):
-        """return id of my retweets"""
 
-        retweets =  self.twitter.retweeted_of_me()
-        retweets_id = [c["id"] for c in retweets]
-        return retweets_id
-
-    def get_followers_ids(self):
-        return self.twitter.get_followers_ids()
 
     def get_victims_timeline(self, text):
         def victims_tweets(name):
@@ -372,56 +362,43 @@ class TwitBot(object):
         
         
         
-
+    @wrapper
     def delete_replies(self):
-        a = self.data.hour
-        if a == 23:
+        if self.data.hour == 23:
             print "START CLEAR TWEETS"
-            try:
-                tweets = self.twitter.get_user_timeline(count= 100)
-                tweets = (c["id"] for c in tweets if c["in_reply_to_user_id"] )
-                sleep(15)
-                map(self.delete_status, tweets)
-            except TwythonError as err:
-                print err
-                sleep(randint(125, 200))
+            tweets = self.get_user_timeline(count=100)
+            tweets = (c["id"] for c in tweets if c["in_reply_to_user_id"] )
+            sleep(15)
+            map(self.destroy_status, tweets)
         else:
             print "NO CLEAN"
 
 
-    def get_dm(self):
-        try:
-            dm = self.twitter.get_direct_messages()
-            return dm 
-        except TwythonError as er:
-            print er
+ 
 ################################## UNFOLLOW ######################################
-
+    @wrapper
     def unfollow_who_not_follow_back(self):
-
         data = self.data
         #clean followers every odd day
         if data.day % 2 == 0 and data.hour == 1:
-            print "UNFOLLOWING START"
-            # "stars" id
-            stars_id = [462792965, 14774424, 344512640,
+            # "stars" id's
+            stars_id = (462792965, 14774424, 344512640,
                         265008715, 412493190, 254655960,
                         179484444, 90647948, 408437933,
-                        98422492,  81297044,  250801581]
-            try:
-                #get friends ids
-                friends_ids = self.twitter.get_friends_ids()[u"ids"]
-                friends_ids = (id for id in friends_ids if id not in stars_id)
-                #get followers ids
-                followers_ids = self.twitter.get_followers_ids()[u"ids"]
-                #unfollowing list
-                destroy_list = (user_id for user_id in friends_ids 
-                                if user_id not in followers_ids)
-                map(self.twitter.destroy_friendship, destroy_list)
-                print "UNFOLLOWING END"
-            except TwythonError as er:
-                print er
-                sleep(60)          
+                        98422492,  81297044,  250801581)
+            print "UNFOLLOWING START"           
+            #get friends id's
+            friends_ids = self.get_friends_ids()[u"ids"]
+            friends_ids = (id for id in friends_ids if id not in stars_id)
+            #get followers ids
+            followers_ids = self.twitter.get_followers_ids()[u"ids"]
+            #unfollowing list
+            destroy_list = (user_id for user_id in friends_ids 
+                            if user_id not in followers_ids)
+            map(self.twitter.destroy_friendship, destroy_list)
+            print "UNFOLLOWING END"
+            
+                    
                 
 ############################### DATE STATUS ############################################
 

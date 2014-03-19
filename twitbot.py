@@ -110,7 +110,7 @@ class TwitBot(object):
                 sleep(400)
 
 ################################################################################
-
+    @wrapper
     def update_dirty_status(self, name, id):
         answers = [ u"Ты еще и ругаешься",
                     u"Попросил бы без оскорблений",
@@ -121,7 +121,7 @@ class TwitBot(object):
                   ] 
               
 
-        self.twitter.update_status(status= u"@{0} {1}".format(
+        self.update_status(status= u"@{0} {1}".format(
                                    name, choice(answers)),
                                    in_reply_to_status_id=id)
         sleep(randint(140,280))
@@ -190,7 +190,8 @@ class TwitBot(object):
                     self.twitter.{0}(id=id)""".format(name))
 
     for name in ("get_home_timeline", "get_direct_messages", "get_friends_ids",
-                 "get_followers_ids", "get_user_timeline", "show_status"):
+                 "get_followers_ids", "get_user_timeline", "show_status",
+                 "update_status"):
 
         exec("""def {0}(self, *args, **kwargs):
                     return self.twitter.{0}(*args, **kwargs)""".format(name))

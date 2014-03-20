@@ -101,7 +101,7 @@ class TwitBot(object):
                 q_id[0] = user[0]
                 sleep(randint(400,560))
 
-
+    @wrapper(n=40)
     def big_search(self):
         for query in QUERYS:
             self.run_search(query, replays)
@@ -384,6 +384,7 @@ class TwitBot(object):
         #this part for count_replies
         if current_time.hour in (9, 16):
             self.flag = True
+            sleep(randint(1600, 2400))
         
         ## def part_of_day(time_of_day):
         ##     """return True if current time equal time_of_day"""
@@ -450,7 +451,7 @@ def main():
         twitter.delete_replies()
         twitter.home_timeline()
         repls = twitter.get_replays()
-        self.tw_reader(repls)
+        twitter.tw_reader(repls)
     
 if __name__ == "__main__":
     main()

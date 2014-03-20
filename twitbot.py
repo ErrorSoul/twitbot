@@ -27,10 +27,10 @@ class TwitBot(object):
         self.twitter = Twython(c_key, c_secret, o_token, o_token_secret)
 
         #last tweet id for query "xохол"
-        self.id = [0]
+        self.id = [None]
 
         #last tweet id for query "xахол"
-        self.jd = [0]
+        self.jd = [None]
 
         
         #last mentions id
@@ -190,6 +190,11 @@ class TwitBot(object):
             print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
             print c[2].encode('utf-8'), '\n'
 
+
+    def complete(self, attr):
+            print "##### COMPLETE #####\n"
+            print "{0} = {1} {2} complete\n".format(attr, eval(attr),'.' * 25)
+
     
              
        
@@ -306,33 +311,28 @@ class TwitBot(object):
 ######################################## START ########################################
     @wrapper(n=0)
     def start(self):
-        def complete(attr):
-            d = {"self.jd":self.jd, "self.id":self.id,
-                 "self.t_id":self.t_id, "self.m_id":self.m_id}
-            print "##### COMPLETE #####\n"
-            print "{0} = {1} {2} complete\n".format(attr, d[attr],'.' * 25)
+        starters = ("jd", "id", "t_id", "m_id")
+        d = dict(zip(QUERYS,(self.jd, self.id)))
+        print d 
 
-        while ((not self.m_id or not self.t_id) or
-               (self.id[0] == 0 or self.jd[0] == 0)):
+        def complete():
+            while True:
+                s = yield
+                if s:
+                    print "##### COMPLETE #####\n"
+                    print "{0} = {1} {2} complete\n".format(s, getattr(self, s) ,'.' * 25)
+                    
+        gen = complete()
+        gen.next()
+        
+        while  not all([eval("self." + c) for c in starters]):
             for query in QUERYS:
                 result = self.twitter.search(q=query)
-                if query == u"хахол":
-                    self.jd[0] = self.get_users(result,debug=1)[-1][0]
-                    if self.jd[0]:
-                        complete("self.jd")
-
-                else:
-                    self.id[0] = self.get_users(result,debug=1)[-1][0]
-                    if self.id[0]:
-                        complete("self.id")
-
+                d[query][0]  = self.get_users(result,debug=1)[-1][0]
             self.t_id = self.twitter.get_home_timeline(exclude_replies = 1)[0]["id"]
-            if self.t_id:
-                complete("self.t_id")
-
             self.m_id =  self.twitter.get_mentions_timeline(count=30, include_rts = 0)[0]["id"]
-            if self.m_id:
-                complete("self.m_id")
+            [gen.send(c) for c in starters]
+            
 
 ###################################### DELETE REPLIES  ##############################################                    
 
@@ -438,6 +438,7 @@ def main():
                       OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
     #start twiter
     twitter.start()
+    twitter.start()
     #init thread
     d = D(twitter)
     d.daemon = True
@@ -456,7 +457,6 @@ def main():
 if __name__ == "__main__":
     main()
     
-     
-         
+
     
 

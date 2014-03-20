@@ -9,12 +9,16 @@ def wrapper(n=120):
             try:
                 f = func(*args, **kwargs)
                 sleep(randint(n, 2*n))
-                if f:return f
+                if f is not None: return f 
             except TwythonError as e:
                 print e
                 sleep(180)
         return shell
     return new
+
+
+
+
 
 if __name__=="__main__":
     
@@ -22,3 +26,11 @@ if __name__=="__main__":
     def x():
         return map(lambda x: x+1,range(10))
     print x()
+
+    @wrapper(n=0)
+    def y():
+        if 1<5:
+            return []
+
+    print y()
+        

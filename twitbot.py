@@ -71,15 +71,11 @@ class TwitBot(object):
             print "#" * 40,'\n'
         return users
 
-##################################RUN SEARCH############################################        
+################################## RUN SEARCH ############################################        
 
     def run_search(self, query, text):
         self.query = query
-        try:
-            result =  self.twitter.search(q=query)
-        except TwythonError as e:
-            print e
-
+        result =  self.twitter.search(q=query)
         if result:
             users = self.get_users(result)
             for user in users:
@@ -94,10 +90,9 @@ class TwitBot(object):
             
     def update_status(self, text, user):
         q_id = self.id if self.query == u"хохол" else self.jd
-
         #replayed tweet or not 
         if  user[0] > q_id[0]:
-            try:
+            
                 self.twitter.update_status(status= u"@{0} {1}".format(
                                            user[1], choice(text)),
                                            in_reply_to_status_id=user[0])
@@ -105,9 +100,15 @@ class TwitBot(object):
                 #save last tweet id 
                 q_id[0] = user[0]
                 sleep(randint(400,560))
-            except TwythonError as err:
-                print err
-                sleep(400)
+
+
+    def big_search(self):
+        for query in QUERYS:
+            self.run_search(query, replays)
+            sleep(70)
+        sleep(randint(60,120))
+        
+            
 
 ################################################################################
     
@@ -183,13 +184,19 @@ class TwitBot(object):
         retweets_id = [c["id"] for c in retweets]
         return retweets_id
 
+    @wrapper(n=30)
+    def tw_reader(self, tw):
+        for c in tw:
+            print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
+            print c[2].encode('utf-8'), '\n'
+
     
              
        
        
 
 ############################### GET REPLAYS #############################################
-    @wrapper()
+    @wrapper(n=0)
     def get_replays(self):
         dirty_list = (u"хуй", u"пидор",u"пидар", u"пидр",
                       u"бля", u"блядь", u"сука",u"ебень",
@@ -215,18 +222,23 @@ class TwitBot(object):
     
         repl = self.twitter.get_mentions_timeline(include_rts = 0,
                                                   since_id = self.m_id)
+        print repl, "repl"
 
         if repl:
+            print "IF REPL"
             repl =[(c["id"],c["user"]["screen_name"],c["text"]) for c
                    in repl if u"RT" not in c["text"]]
             self.m_id = repl[0][0]
             repl = filter(is_shit, repl)
             if repl:
+                print "IF REPL INNER"
                 print "Try send mention for dirty reply"
                 for tw in repl:
-                   (self.retweet(tw[0]) if randint(0,1)
+                    (self.retweet(tw[0]) if randint(0,1)
                     else self.update_dirty_status(tw[1],tw[0]))
-            return repl
+                   
+            #return repl
+        print repl, "repl"
         return repl 
         
             
@@ -244,6 +256,8 @@ class TwitBot(object):
                                    name, choice(answers)),
                                    in_reply_to_status_id=id)
         sleep(randint(140,280))
+
+    
 ######################################## STEAL TWEET ################################
     @wrapper()
     def steal_tweets(self, d):
@@ -417,16 +431,12 @@ class D(Thread):
         while True:
             self.p()
         
-
-if __name__ == "__main__":
+def main():
+    #connection and login 
     twitter = TwitBot(CONSUMER_KEY,CONSUMER_SECRET,
                       OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
-
-
-    #twitter.delete_status("445662008466493440")
     #start twiter
     twitter.start()
-   
     #init thread
     d = D(twitter)
     d.daemon = True
@@ -439,13 +449,13 @@ if __name__ == "__main__":
         twitter.unfollow_who_not_follow_back()
         twitter.delete_replies()
         twitter.home_timeline()
-        for query in QUERYS:
-            twitter.run_search(query, replays)
-            sleep(70)
-        sleep(randint(60,120))
-        y = twitter.get_replays()
-        for c in y:
-            print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
-            print c[2].encode('utf-8'), '\n' 
+        repls = twitter.get_replays()
+        self.tw_reader(repls)
+    
+if __name__ == "__main__":
+    main()
+    
+     
+         
     
 

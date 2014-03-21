@@ -79,10 +79,10 @@ class TwitBot(object):
         if result:
             users = self.get_users(result)
             for user in users:
-                    if self.replies_count < self.replies_limit:
-                        self.update_status(text,user)
-                    else:
-                        break
+                if self.replies_count < self.replies_limit:
+                    self.update_status(text,user)
+                else:
+                    break
                     
             sleep(randint(180,210))
         else:
@@ -140,13 +140,13 @@ class TwitBot(object):
             if (hour in range(0, 3) or hour in range(9, 24)):
                 print "CHECK TIMELINE UPDATES"
                 result = self.get_home_timeline(count=30,exclude_replies=1,
-                                            since_id=self.t_id)
+                                                since_id=self.t_id)
                 if result:
                     tw = [tweet["id"] for tweet in result if (tweet['user']['screen_name'] != u"ghohol" and
                                                             not tweet['entities']['user_mentions'])]
                     if tw:
                         self.t_id = tw[0]
-                        rt_or_fav = lambda func : map(func, filter(lambda x:x % 127 == 0, tw))
+                        rt_or_fav = lambda func : map(func, filter(lambda x:x % 27 == 0, tw))
                         if (randint(0,7) == randint(0,7)):                           
                             map(rt_or_fav,(self.retweet, self.create_favorite))
             else:
@@ -167,8 +167,7 @@ class TwitBot(object):
                     self.twitter.{0}(id=id)""".format(name))
 
     for name in ("get_home_timeline", "get_direct_messages", "get_friends_ids",
-                 "get_followers_ids", "get_user_timeline", "show_status",
-                 "update_status"):
+                 "get_followers_ids", "get_user_timeline", "show_status"):
 
         exec("""def {0}(self, *args, **kwargs):
                     return self.twitter.{0}(*args, **kwargs)""".format(name))
@@ -259,7 +258,7 @@ class TwitBot(object):
 
     
 ######################################## STEAL TWEET ################################
-    @wrapper()
+    @wrapper(n=0)
     def steal_tweets(self, d):
         hour = d.hour
         print hour, "FGGGGGGGGGGGGGGGGJJGJGJGJGJJJJJJJJJJJJJJJJJ"
@@ -287,16 +286,17 @@ class TwitBot(object):
             raw_tweets =  self.twitter.get_user_timeline(screen_name=name, exclude_replies=1, count=60)
             print "dddd"
             print "raw_tweets", len(raw_tweets)
-            tweets = raw_tweets[-1:len(raw_tweets):-1]
+            tweets = raw_tweets[-1:-len(raw_tweets):-1]
+            #print tweets
             tweets = [c for c in tweets if (not c["entities"]['urls'] and
                                                   len(c['entities'])==4 and
                                                   not c['entities']['user_mentions']
                                                   )]
-
+            
             sample_tweet = [c['text'] for c in tweets if c['text'] not in text]
             if sample_tweet:
                 sample_tweet = sample_tweet[-1]
-                print sample_tweet.encode('utf-8')
+                print sample_tweet.encode('utf-8'), "sample_tweet"
                 return sample_tweet
             else:
                 return None
@@ -427,12 +427,13 @@ class D(Thread):
             self.p()
         
 def main():
+    
     #connection and login 
     twitter = TwitBot(CONSUMER_KEY,CONSUMER_SECRET,
-                      OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
-    #start twiter
+                        OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
+    ## #start twiter
     twitter.start()
-    twitter.start()
+    
     #init thread
     d = D(twitter)
     d.daemon = True

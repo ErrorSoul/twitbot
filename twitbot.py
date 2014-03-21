@@ -153,7 +153,7 @@ class TwitBot(object):
                 print "NO TIMELINE UPDATES" 
                             
         
-        #update_replies_count()
+        update_replies_count()
         timeline_updates()                
 
                     

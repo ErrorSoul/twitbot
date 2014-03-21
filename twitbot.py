@@ -190,11 +190,6 @@ class TwitBot(object):
             print "Tweet from @{0} ID: {1}".format(c[1].encode('utf-8'), c[0])
             print c[2].encode('utf-8'), '\n'
 
-
-    def complete(self, attr):
-            print "##### COMPLETE #####\n"
-            print "{0} = {1} {2} complete\n".format(attr, eval(attr),'.' * 25)
-
     
              
        
@@ -313,7 +308,6 @@ class TwitBot(object):
     def start(self):
         starters = ("jd", "id", "t_id", "m_id")
         d = dict(zip(QUERYS,(self.jd, self.id)))
-        print d 
 
         def complete():
             while True:

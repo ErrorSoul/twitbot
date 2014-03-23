@@ -271,7 +271,7 @@ class TwitBot(object):
             get_victims_timeline = self.get_victims_timeline(my_tweets)
             victims_tweets = map(get_victims_timeline, self.users)
             for tweet in victims_tweets:
-                print tweet
+                print tweet.encode('utf-8')
                 if tweet is not None:
                     self.twitter.update_status(status=tweet)
                     sleep(3600)
@@ -446,6 +446,7 @@ def main():
         twitter.unfollow_who_not_follow_back()
         twitter.delete_replies()
         twitter.home_timeline()
+        twitter.big_search()
         repls = twitter.get_replays()
         twitter.tw_reader(repls)
     

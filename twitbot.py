@@ -363,7 +363,7 @@ class TwitBot(object):
             #unfollowing list
             destroy_list = (user_id for user_id in friends_ids 
                             if user_id not in followers_ids)
-            map(self.twitter.destroy_friendship, destroy_list)
+            map(self.destroy_friendship, destroy_list)
             print "UNFOLLOWING END"
             
                     
@@ -444,11 +444,11 @@ def main():
     t.start()
     while True:
         twitter.unfollow_who_not_follow_back()
-        twitter.delete_replies()
-        twitter.home_timeline()
-        twitter.big_search()
-        repls = twitter.get_replays()
-        twitter.tw_reader(repls)
+        ## twitter.delete_replies()
+        ## twitter.home_timeline()
+        ## twitter.big_search()
+        ## repls = twitter.get_replays()
+        ## twitter.tw_reader(repls)
     
 if __name__ == "__main__":
     main()

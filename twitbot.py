@@ -146,7 +146,7 @@ class TwitBot(object):
                                                             not tweet['entities']['user_mentions'])]
                     if tw:
                         self.t_id = tw[0]
-                        rt_or_fav = lambda func : map(func, filter(lambda x:x % 27 == 0, tw))
+                        rt_or_fav = lambda func : map(func, filter(lambda x:x % randint(21,27) == 0, tw))
                         if (randint(0,7) == randint(0,7)):                           
                             map(rt_or_fav,(self.retweet, self.create_favorite))
             else:

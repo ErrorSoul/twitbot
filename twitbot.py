@@ -444,11 +444,11 @@ def main():
     t.start()
     while True:
         twitter.unfollow_who_not_follow_back()
-        ## twitter.delete_replies()
-        ## twitter.home_timeline()
-        ## twitter.big_search()
-        ## repls = twitter.get_replays()
-        ## twitter.tw_reader(repls)
+        twitter.delete_replies()
+        twitter.home_timeline()
+        twitter.big_search()
+        repls = twitter.get_replays()
+        twitter.tw_reader(repls)
     
 if __name__ == "__main__":
     main()
